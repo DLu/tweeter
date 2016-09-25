@@ -154,7 +154,20 @@ class Tweeter:
     def get_tweets(self):
         for slug in self.lists:
             self.update_list(slug)
-            
+
+    def all_tweets(self):
+        all_tweets = []
+        for tweets in self.tweets.values():
+            all_tweets += tweets
+        return all_tweets
+
+    def mark_as_read(self, tweet, slug=None):
+        if slug is None:
+            for slug, tweets in self.tweets.iteritems():
+                if tweet in tweets:
+                    break
+        self.tweets[slug].remove(tweet)
+
     def write(self):
         main_fn = os.path.join(self.root, 'tweeter.yaml')
         yaml.dump(self.meta, open(main_fn, 'w'))
