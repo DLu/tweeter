@@ -33,6 +33,7 @@ class Tweeter:
             self.meta = {}
         
         self.lists = {}
+        self.tweets = {}
         for slug in self.meta.get('lists', []):
             fn = self.get_list_info(slug)
             if os.path.exists(fn):
@@ -41,16 +42,30 @@ class Tweeter:
                 D = {}
             self.lists[slug] = D
             
+            fn = self.get_tweet_info(slug)
+            if os.path.exists(fn):
+                A = yaml.load(open(fn))
+            else:
+                A = []
+            self.tweets[slug] = A
+            
         self.users = {}
         user_folder = os.path.join(self.root, 'users')
         if not os.path.exists(user_folder):
             os.mkdir(user_folder)
+
+        tweets_folder = os.path.join(self.root, 'tweets')
+        if not os.path.exists(tweets_folder):
+            os.mkdir(tweets_folder)
     
     def get_list_info(self, slug):
         return os.path.join(self.root, slug + '.yaml')
         
     def get_user_info(self, handle):
         return os.path.join(self.root, 'users', handle + '.yaml')
+
+    def get_tweet_info(self, slug):
+        return os.path.join(self.root, 'tweets', slug + '.yaml')
 
     # API METHODS ##############################################################
     def query_lists(self):
@@ -62,8 +77,8 @@ class Tweeter:
             lists[str(t_list.slug)] = d
         return lists
         
-    def get_list_tweets(self, list_id, since_id=None, count=200):
-        return self.api.GetListTimeline(list_id=list_id, since_id=since_id, count=count)
+    def get_list_tweets(self, list_id, since_id=None, max_id=None, count=200):
+        return self.api.GetListTimeline(list_id=list_id, since_id=since_id, max_id=max_id, count=count)
         
     # DB METHODS ###############################################################
     def update_lists(self):
@@ -99,16 +114,54 @@ class Tweeter:
         tweet = {}
         fields = ['created_at', 'id_str', 'retweet_count', 'text']
         copy_fields(obj, tweet, fields)
-        for url in obj.urls:
-            tweet['text'] = tweet['text'].replace( url.url, url.expanded_url)
+        tweet['handle'] = str(obj.user.screen_name)
+        if obj.retweeted_status:
+            handle = str(obj.retweeted_status.user.screen_name)
+            id_str = str(obj.retweeted_status.id_str)
+            tweet['text'] = 'https://twitter.com/%s/status/%s'%(handle, id_str)
+        else:            
+            for url in obj.urls:
+                tweet['text'] = tweet['text'].replace( url.url, url.expanded_url)
         return tweet
+
+    def update_list(self, slug, count=150):
+        info = self.lists[slug]
+        max_id = info.get('max_id', None)
+        raw_tweets = self.get_list_tweets(list_id=info['id'], since_id=info['since_id'], max_id=max_id, count=count)
+        print len(raw_tweets)
+        if len(raw_tweets)==1 and max_id is not None:
+            del info['max_id']
+            raw_tweets = self.get_list_tweets(list_id=info['id'], since_id=info['since_id'], count=count)
+            print len(raw_tweets)
+        first_id = None
+        max_id = None
+        for x in raw_tweets:
+            self.process_user(x.user)
+            tweet = self.clean_tweet(x)
+            if tweet not in self.tweets[slug]:
+                self.tweets[slug].append(tweet)
+            print tweet['id_str'], tweet['text']
+            if first_id is None:
+                first_id = tweet['id_str']
+            max_id = tweet['id_str']
+            
+        if len(raw_tweets)>=count:
+            info['max_id'] = max_id
+        elif first_id:
+            info['since_id'] = first_id
+            info.pop('max_id', None)
+            
+    def get_tweets(self):
+        for slug in self.lists:
+            self.update_list(slug)
             
     def write(self):
         main_fn = os.path.join(self.root, 'tweeter.yaml')
         yaml.dump(self.meta, open(main_fn, 'w'))
         for slug, info in self.lists.iteritems():
-            fn = self.get_list_info(slug)
-            yaml.dump(info, open(fn, 'w'))
+            yaml.dump(info, open(self.get_list_info(slug), 'w'))
+            yaml.dump(self.tweets[slug], open(self.get_tweet_info(slug), 'w'))
+            print slug, len(self.tweets[slug])
         for handle, info in self.users.iteritems():
             fn = self.get_user_info(handle)
             yaml.dump(info, open(fn, 'w'))

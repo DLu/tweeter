@@ -11,4 +11,6 @@ twit = tweeter.Tweeter()
 if args.lists:
     twit.update_lists()
 
+twit.get_tweets()
+
 twit.write()
