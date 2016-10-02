@@ -1,0 +1,31 @@
+<html>
+<head>
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+  <script type=text/javascript>
+    document.addEventListener("keydown", keyDownTextField, false);
+    function keyDownTextField(e) {
+      if(e.keyCode==76){
+        read = false;
+      }else if (e.keyCode==32) {
+        read = true;
+      }else{
+        return;
+      }
+      
+      $.getJSON('/interact', {read: read}, function(data) {
+        load_tweet(data.id);
+      });
+    }
+    
+    function load_tweet(id)
+    {
+      $.getJSON("https://api.twitter.com/1/statuses/oembed.json?id=" + id + "&align=center&callback=?",
+        function(data){$('#tweet').html(data.html);});
+    }
+  </script>
+</head>
+<body>
+  <div id='tweet'></div>  
+</body>
+</html>
