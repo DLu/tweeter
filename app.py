@@ -21,7 +21,8 @@ class Reader:
     def get_tweet(self, chosen_list=None):
         tweet = self.twit.get_tweet(chosen_list, self.skipped)
         self.current = tweet
-        return self.current['id_str']
+        if self.current:
+            return self.current['id_str']
 
 reader = Reader()
 
