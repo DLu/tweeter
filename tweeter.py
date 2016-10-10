@@ -163,6 +163,12 @@ class Tweeter:
 
     def clear_tweets(self, name):
         self.tweets[name] = []
+        
+    def get_sizes(self):
+        sizes = []
+        for name in self.lists:
+            sizes.append( (name, len(self.tweets[name])))
+        return sizes
 
     def mark_as_read(self, tweet, slug=None):
         if slug is None:

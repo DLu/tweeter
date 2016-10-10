@@ -5,8 +5,8 @@ import tweeter
 twit = tweeter.Tweeter()
 
 while True:
-    for i, (name, info) in enumerate(twit.lists.iteritems()):
-        print '%02d) %-12s %4s'%(i, name, str(len(twit.tweets[name])))
+    for i, (name, size) in enumerate(twit.get_sizes()):
+        print '%02d) %-12s %4s'%(i, name, str(size))
     inp = raw_input('clear list? ')
     if inp=='q':
         break
