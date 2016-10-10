@@ -19,15 +19,9 @@ class Reader:
         self.current = None
         
     def get_tweet(self, chosen_list=None):
-        for lname, tweets in self.twit.tweets.iteritems():
-            if chosen_list is not None and lname != chosen_list:
-                continue
-            for tweet in tweets:
-                if tweet['id_str'] in self.skipped:
-                    continue
-                else:
-                    self.current = tweet
-                    return self.current['id_str']
+        tweet = self.twit.get_tweet(chosen_list, self.skipped)
+        self.current = tweet
+        return self.current['id_str']
 
 reader = Reader()
 

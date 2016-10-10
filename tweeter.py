@@ -1,6 +1,7 @@
 import twitter
 import yaml
 import os
+from dateutil import parser
 
 def copy_fields(obj, D, fields):
     for field in fields:
@@ -176,6 +177,20 @@ class Tweeter:
                 if tweet in tweets:
                     break
         self.tweets[slug].remove(tweet)
+        
+    def get_tweet(self, slug=None, skipped={}):
+        if slug:
+            keys = [slug]
+        else:
+            keys = self.lists.keys()
+        
+        for key in keys:
+            for tweet in sorted(self.tweets[key], key=lambda t: parser.parse(t['created_at'])):
+                if tweet['id_str'] in skipped:
+                    continue
+                else:
+                    return tweet
+
 
     def write(self):
         main_fn = os.path.join(self.root, 'tweeter.yaml')
