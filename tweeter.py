@@ -161,6 +161,9 @@ class Tweeter:
             all_tweets += tweets
         return all_tweets
 
+    def clear_tweets(self, name):
+        self.tweets[name] = []
+
     def mark_as_read(self, tweet, slug=None):
         if slug is None:
             for slug, tweets in self.tweets.iteritems():
