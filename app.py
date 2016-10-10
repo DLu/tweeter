@@ -18,8 +18,10 @@ class Reader:
             self.skipped.add(self.current['id_str'])
         self.current = None
         
-    def get_tweet(self):
+    def get_tweet(self, chosen_list=None):
         for lname, tweets in self.twit.tweets.iteritems():
+            if chosen_list is not None and lname != chosen_list:
+                continue
             for tweet in tweets:
                 if tweet['id_str'] in self.skipped:
                     continue
@@ -37,8 +39,16 @@ def index():
 def interact():
     if 'read' in request.args:
         reader.post(request.args.get('read')=='true')
-    id = reader.get_tweet()
-    return jsonify(id=id)
+    slug = request.args.get('list', 'all')
+    if slug=='all':
+        slug = None
+    id = reader.get_tweet(slug)
+    M = {'id': id, 'lists': reader.twit.get_sizes()}
+    return jsonify(M)
+    
+@app.route('/tweeter.css')
+def css():
+    return render_template('tweeter.css')
 
 if __name__ == '__main__':
     try:

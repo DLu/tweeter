@@ -2,7 +2,18 @@
 <head>
   <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+  <link rel="stylesheet" type="text/css" href="tweeter.css">
   <script type=text/javascript>
+    function load_page(read=false)
+    {
+      console.log(current_list());
+      $.getJSON('/interact', {read: read, list: current_list()}, function(data) {
+        load_tweet(data.id);
+        load_lists(data.lists)
+      });
+    }
+  
+  
     document.addEventListener("keydown", keyDownTextField, false);
     function keyDownTextField(e) {
       if(e.keyCode==76){
@@ -12,20 +23,84 @@
       }else{
         return;
       }
-      
-      $.getJSON('/interact', {read: read}, function(data) {
-        load_tweet(data.id);
-      });
+      load_page(read);      
     }
     
     function load_tweet(id)
     {
+      if(id){
       $.getJSON("https://api.twitter.com/1/statuses/oembed.json?id=" + id + "&align=center&callback=?",
         function(data){$('#tweet').html(data.html);});
+      }
     }
+    
+    function create_option(name, size, selected)
+    {
+      var line = document.createElement('li');
+      var input = document.createElement('input');
+      input.setAttribute('type', 'radio');
+      input.setAttribute('name', 'list_select');
+      input.setAttribute('id', 'list_select');
+      input.setAttribute('value', name);
+      if(selected==name){
+        input.setAttribute('checked', 'checked');
+      }
+      input.setAttribute('onclick', 'load_page()');
+      line.appendChild(input);
+      var label = document.createElement('label');
+      label.setAttribute('for', name);
+      label.appendChild(document.createTextNode(name + " (" + size + ")"));
+      line.appendChild(label);
+      
+      var div = document.createElement('div');
+      div.setAttribute('class', 'check');
+      line.appendChild(div);    
+      return line;    
+    }
+    
+    function current_list(){
+      var selector = document.querySelector('input[name="list_select"]:checked');
+      if(selector){
+        console.log("XX");
+        console.log(selector.value);
+        return selector.value;
+      }
+      return 'all';
+    }
+    
+    function load_lists(L)
+    {
+      var selected = current_list();
+      var node = document.getElementById('lists');
+      while (node.hasChildNodes()) {
+        node.removeChild(node.lastChild);
+      }
+      var ul = document.createElement('ul');
+      var total = 0;
+      for(var i in L)
+      {
+        var name = L[i][0];
+        var size = L[i][1];
+        total += size;
+        
+        ul.appendChild(create_option(name, size, selected));
+      }
+      ul.insertBefore(create_option('all', total, selected), ul.childNodes[0]);
+      
+      node.appendChild(ul);
+    }
+    
+  $(function() {
+    load_page();
+  });
   </script>
 </head>
 <body>
-  <div id='tweet'></div>  
+  <table width="100%">
+    <tr>
+      <td><div id='lists' class="lists"></div>
+        <td><div id='tweet'></div>  
+    </tr>
+  </table>
 </body>
 </html>
