@@ -1,6 +1,6 @@
 <html>
 <head>
-  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
   <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
   <link rel="stylesheet" type="text/css" href="tweeter.css">
   <script type=text/javascript>
@@ -29,7 +29,10 @@
     {
       if(id){
       $.getJSON("https://api.twitter.com/1/statuses/oembed.json?id=" + id + "&align=center&callback=?",
-        function(data){$('#tweet').html(data.html);});
+        function(data){ $('#tweet').html(data.html);}).error(
+          function(a,b,c){ 
+            $.getJSON("/formatted", function(data){ $('#tweet').html(data.html) });
+          });
       }else{        
         var node = document.getElementById('tweet');
         while (node.hasChildNodes()) {

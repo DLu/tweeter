@@ -45,6 +45,13 @@ def interact():
 def css():
     return render_template('tweeter.css')
 
+@app.route('/formatted')
+def format_tweet():
+    reader.get_tweet(None)
+    J = reader.current
+    J.update(reader.twit.get_user(J['handle']))
+    return jsonify({'html': render_template('single_tweet.html', data=J)})
+
 if __name__ == '__main__':
     try:
         app.run(host='0.0.0.0')

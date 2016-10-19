@@ -2,3 +2,36 @@ label {text-transform: capitalize;}
 .lists ul {
   list-style: none;  
 }
+
+.EmbeddedTweet {
+    overflow: hidden;
+    cursor: pointer;
+    background-color: #fff;
+    border: 1px solid #e1e8ed;
+    border-radius: 4px;
+    max-width: 520px;
+    font: normal normal 16px/1.4 Helvetica,Roboto,"Segoe UI",Calibri,sans-serif;
+    display: block;
+}
+
+.TweetAuthor {
+    margin-top: 2px;
+    line-height: 0;
+    max-width: 100%;
+    overflow: hidden!important;
+    text-overflow: ellipsis!important;
+    white-space: nowrap!important;
+    word-wrap: normal!important;
+}
+
+.TweetAuthor-avatar {
+    position: absolute;
+    display: inline-block;
+    top: 0px;
+    left: 0px;
+    width: 36px;
+    height: 36px;
+    background-color: transparent;
+    overflow: hidden;
+    border-radius: 4px;
+}
