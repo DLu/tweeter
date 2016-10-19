@@ -1,6 +1,7 @@
 #!/usr/bin/python
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 import tweeter
+import os.path
 app = Flask(__name__)
 
 class Reader:
@@ -51,6 +52,10 @@ def format_tweet():
     J = reader.current
     J.update(reader.twit.get_user(J['handle']))
     return jsonify({'html': render_template('single_tweet.html', data=J)})
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico')
 
 if __name__ == '__main__':
     try:
