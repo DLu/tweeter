@@ -12,19 +12,20 @@ patterns = [RETWEET_PATTERN, SUBTWEET_PATTERN]
 def format_tweet(tweet):
     return '@%-15s | %s'%(tweet['handle'], tweet['text']) + (' [%d]'%tweet['retweet_count'] if tweet['retweet_count']>0 else '')
 
-twit = tweeter.Tweeter()
-all = twit.all_tweets()
-print len(all)
-for tweet in all:
-    for pattern in patterns:
-        if pattern.match(tweet['text']):
-            break
-    else:
-        print format_tweet(tweet)
-        x = raw_input().strip()
-        if len(x)==0:
-            twit.mark_as_read(tweet)
-        elif x=='q':
-            break
-print len(twit.all_tweets())
-twit.write()
+if __name__=='__main__':
+    twit = tweeter.Tweeter()
+    all = twit.all_tweets()
+    print len(all)
+    for tweet in all:
+        for pattern in patterns:
+            if pattern.match(tweet['text']):
+                break
+        else:
+            print format_tweet(tweet)
+            x = raw_input().strip()
+            if len(x)==0:
+                twit.mark_as_read(tweet)
+            elif x=='q':
+                break
+    print len(twit.all_tweets())
+    twit.write()
