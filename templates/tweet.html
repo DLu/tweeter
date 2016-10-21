@@ -13,9 +13,12 @@
       return node;
     }
   
-    function load_page(read=false)
+    function load_page(read=null)
     {
-      $.getJSON('/interact', {read: read, list: current_list()}, function(data) {
+      var params = {list: current_list()};
+      if(read!==null)
+        params['read'] = read;
+      $.getJSON('/interact', params, function(data) {
         load_tweet(data.id);
         load_lists(data.lists)
       });
