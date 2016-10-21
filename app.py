@@ -49,7 +49,7 @@ def css():
 @app.route('/formatted')
 def format_tweet():
     reader.get_tweet(None)
-    J = reader.current
+    J = dict(reader.current)
     J.update(reader.twit.get_user(J['handle']))
     return jsonify({'html': render_template('single_tweet.html', data=J)})
 
