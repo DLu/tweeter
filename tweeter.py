@@ -2,6 +2,11 @@ import twitter
 import yaml
 import os
 from dateutil import parser
+import re
+
+RT_P = 'https://twitter.com/[^/]+/status/(\d+)'
+RETWEET_PATTERN = re.compile(RT_P)
+SUBTWEET_PATTERN = re.compile('.*'+RT_P)
 
 def copy_fields(obj, D, fields):
     for field in fields:
@@ -12,6 +17,16 @@ def copy_fields(obj, D, fields):
             except UnicodeEncodeError:
                 None
         D[field] = value
+
+def is_retweet(tweet):
+    m = RETWEET_PATTERN.match(tweet['text'])
+    if m:
+        return m.group(1)
+
+def is_subtweet(tweet):
+    m = SUBTWEET_PATTERN.match(tweet['text'])
+    if m:
+        return m.group(1)
 
 class Tweeter:
     def __init__(self):
