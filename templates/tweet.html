@@ -4,6 +4,15 @@
   <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
   <link rel="stylesheet" type="text/css" href="tweeter.css">
   <script type=text/javascript>
+    function clear_node(node_name)
+    {
+      var node = document.getElementById(node_name);
+      while (node.hasChildNodes()) {
+        node.removeChild(node.lastChild);
+      }
+      return node;
+    }
+  
     function load_page(read=false)
     {
       $.getJSON('/interact', {read: read, list: current_list()}, function(data) {
@@ -34,10 +43,7 @@
             $.getJSON("/formatted", function(data){ $('#tweet').html(data.html) });
           });
       }else{        
-        var node = document.getElementById('tweet');
-        while (node.hasChildNodes()) {
-          node.removeChild(node.lastChild);
-        }
+        clear_node('tweet');
       }
     }
     
@@ -76,10 +82,7 @@
     function load_lists(L)
     {
       var selected = current_list();
-      var node = document.getElementById('lists');
-      while (node.hasChildNodes()) {
-        node.removeChild(node.lastChild);
-      }
+      var node = clear_node('lists');
       var ul = document.createElement('ul');
       var total = 0;
       for(var i in L)
