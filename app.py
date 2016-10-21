@@ -23,7 +23,7 @@ class Reader:
         tweet = self.twit.get_tweet(chosen_list, self.skipped)
         self.current = tweet
         if self.current:
-            return self.current['id_str']
+            return {'id': self.current['id_str']}
 
 reader = Reader()
 
@@ -38,8 +38,8 @@ def interact():
     slug = request.args.get('list', 'all')
     if slug=='all':
         slug = None
-    id = reader.get_tweet(slug)
-    M = {'id': id, 'lists': reader.twit.get_sizes()}
+    M = reader.get_tweet(slug)
+    M['lists'] = reader.twit.get_sizes()
     return jsonify(M)
     
 @app.route('/tweeter.css')
@@ -48,7 +48,6 @@ def css():
 
 @app.route('/formatted')
 def format_tweet():
-    reader.get_tweet(None)
     J = dict(reader.current)
     J.update(reader.twit.get_user(J['handle']))
     return jsonify({'html': render_template('single_tweet.html', data=J)})
