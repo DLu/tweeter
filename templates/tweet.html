@@ -95,6 +95,20 @@
       node.appendChild(ul);
     }
     
+    function update(){
+      $.getJSON("/update",
+        function(data){ 
+          $('#status').html(data.message);
+          });
+    }
+    
+    function save_to_disk(){
+      $.getJSON("/write",
+        function(data){ 
+          $('#status').html(data.message);
+          });
+    }
+    
   $(function() {
     load_page();
   });
@@ -103,8 +117,11 @@
 <body>
   <table width="100%">
     <tr>
-      <td><div id='lists' class="lists"></div>
-        <td><div id='tweet'></div>  
+      <td><button type="button" onclick="update()">Update</button>
+          <button type="button" onclick="save_to_disk()">Write</button>
+          <div id='lists' class="lists"></div>
+          <div id='status'></div>
+      <td><div id='tweet'></div>  
     </tr>
   </table>
 </body>

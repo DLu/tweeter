@@ -56,6 +56,16 @@ def format_tweet():
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico')
+    
+@app.route('/update')
+def update():
+    reader.twit.get_tweets()
+    return jsonify({'message': 'Updated!'})
+
+@app.route('/write')
+def save():
+    reader.twit.write()
+    return jsonify({'message': 'Written!'})
 
 if __name__ == '__main__':
     try:
