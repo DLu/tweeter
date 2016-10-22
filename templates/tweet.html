@@ -19,7 +19,7 @@
       if(read!==null)
         params['read'] = read;
       $.getJSON('/interact', params, function(data) {
-        load_tweet(data.id);
+        load_tweet(data.id, data.retweeter);
         load_lists(data.lists)
       });
     }
@@ -37,7 +37,7 @@
       load_page(read);      
     }
     
-    function load_tweet(id)
+    function load_tweet(id, retweeter)
     {
       if(id){
       $.getJSON("https://api.twitter.com/1/statuses/oembed.json?id=" + id + "&align=left&callback=?",
@@ -47,6 +47,11 @@
           });
       }else{        
         clear_node('tweet');
+      }
+      if(retweeter){
+        $('#rt').html('@' + retweeter + ' retweeted');
+      }else{
+        clear_node('rt');
       }
     }
     
@@ -127,7 +132,8 @@
           <button type="button" onclick="save_to_disk()">Write</button>
           <div id='lists' class="lists"></div>
           <div id='status'></div>
-      <td><div id='tweet'></div>  
+      <td><div id='rt'></div>  
+          <div id='tweet'></div>  
     </tr>
   </table>
 </body>

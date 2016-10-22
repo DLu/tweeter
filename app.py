@@ -22,8 +22,14 @@ class Reader:
     def get_tweet(self, chosen_list=None):
         tweet = self.twit.get_tweet(chosen_list, self.skipped)
         self.current = tweet
-        if self.current:
-            return {'id': self.current['id_str']}
+        if not self.current:
+            return {}
+        M = {'id': self.current['id_str']}
+        rt = tweeter.is_retweet(tweet)
+        if rt:
+            M['id'] = rt
+            M['retweeter'] = tweet['handle']
+        return M
 
 reader = Reader()
 
