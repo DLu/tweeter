@@ -19,8 +19,8 @@ class Reader:
             self.skipped.add(self.current['id_str'])
         self.current = None
         
-    def get_tweet(self, chosen_list=None):
-        tweet = self.twit.get_tweet(chosen_list, self.skipped)
+    def get_tweet(self, chosen_list=None, username=None):
+        tweet = self.twit.get_tweet(chosen_list, username, self.skipped)
         self.current = tweet
         if not self.current:
             return {}
@@ -47,10 +47,15 @@ def interact():
     if 'read' in request.args:
         reader.post(request.args.get('read')=='true')
     slug = request.args.get('list', 'all')
+    username = request.args.get('user', None)
     if slug=='all':
         slug = None
-    M = reader.get_tweet(slug)
+    if username=='all':
+        username = None
+    M = reader.get_tweet(slug, username)
     M['lists'] = reader.twit.get_sizes()
+    if slug:
+        M['users'] = sorted(reader.twit.get_user_counts(slug).items())
     return jsonify(M)
     
 @app.route('/tweeter.css')

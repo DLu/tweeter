@@ -15,12 +15,17 @@
   
     function load_page(read=null)
     {
-      var params = {list: current_list()};
+      var params = {list: current_value('lists_select')};
       if(read!==null)
         params['read'] = read;
+      var user = current_value('users_select');
+      if(user)
+        params['user'] = user;
+
       $.getJSON('/interact', params, function(data) {
         load_tweet(data.id, data.retweeter, data.id2);
-        load_lists(data.lists)
+        load_lists(data.lists, 'lists');
+        load_lists(data.users, 'users');
       });
     }
   
@@ -67,13 +72,13 @@
       }
     }
     
-    function create_option(name, size, selected)
+    function create_option(name, size, selected, parent_name)
     {
       var line = document.createElement('li');
       var input = document.createElement('input');
       input.setAttribute('type', 'radio');
-      input.setAttribute('name', 'list_select');
-      input.setAttribute('id', 'list_select');
+      input.setAttribute('name', parent_name);
+      input.setAttribute('id', parent_name);
       input.setAttribute('value', name);
       if(selected==name){
         input.setAttribute('checked', 'checked');
@@ -91,18 +96,25 @@
       return line;    
     }
     
-    function current_list(){
-      var selector = document.querySelector('input[name="list_select"]:checked');
+    function current_value(name){
+      var node = document.getElementById(name);
+      if(!node) return node;      
+      var selector = document.querySelector('input[name="' + name + '"]:checked');
       if(selector){
         return selector.value;
       }
       return 'all';
     }
     
-    function load_lists(L)
+    function load_lists(L, element_name)
     {
-      var selected = current_list();
-      var node = clear_node('lists');
+      var parent_name = element_name + "_select";
+      var selected = current_value(parent_name);
+      var node = clear_node(element_name);
+      if(!L || L.length==0)
+        return;
+      if(!selected)
+        selected = 'all';
       var ul = document.createElement('ul');
       var total = 0;
       for(var i in L)
@@ -111,9 +123,9 @@
         var size = L[i][1];
         total += size;
         
-        ul.appendChild(create_option(name, size, selected));
+        ul.appendChild(create_option(name, size, selected, parent_name));
       }
-      ul.insertBefore(create_option('all', total, selected), ul.childNodes[0]);
+      ul.insertBefore(create_option('all', total, selected, parent_name), ul.childNodes[0]);
       
       node.appendChild(ul);
     }
@@ -143,6 +155,7 @@
       <td><button type="button" onclick="update()">Update</button>
           <button type="button" onclick="save_to_disk()">Write</button>
           <div id='lists' class="lists"></div>
+          <div id='users' class="lists"></div>
           <div id='status'></div>
       <td><div id='rt'></div>  
           <div id='tweet'></div>  

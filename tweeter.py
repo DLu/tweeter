@@ -4,6 +4,7 @@ import yaml
 import os
 from dateutil import parser
 import re
+import collections
 
 RT_P = 'https://twitter.com/[^/]+/status/(\d+)'
 RETWEET_PATTERN = re.compile(RT_P)
@@ -205,6 +206,12 @@ class Tweeter:
         for name in self.lists:
             sizes.append( (name, len(self.tweets[name])))
         return sizes
+    
+    def get_user_counts(self, slug):
+        counts = collections.defaultdict(int)
+        for tweet in self.tweets[slug]:
+            counts[tweet['handle']]+=1
+        return dict(counts)
 
     def mark_as_read(self, tweet, slug=None):
         if slug is None:
@@ -213,7 +220,7 @@ class Tweeter:
                     break
         self.tweets[slug].remove(tweet)
         
-    def get_tweet(self, slug=None, skipped={}):
+    def get_tweet(self, slug=None, username=None, skipped={}):
         if slug:
             keys = [slug]
         else:
@@ -222,6 +229,8 @@ class Tweeter:
         for key in keys:
             for tweet in sorted(self.tweets[key], key=lambda t: parser.parse(t['created_at'])):
                 if tweet['id_str'] in skipped:
+                    continue
+                elif username and username!=tweet['handle']:
                     continue
                 else:
                     return tweet
