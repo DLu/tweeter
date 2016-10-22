@@ -19,7 +19,7 @@
       if(read!==null)
         params['read'] = read;
       $.getJSON('/interact', params, function(data) {
-        load_tweet(data.id, data.retweeter);
+        load_tweet(data.id, data.retweeter, data.id2);
         load_lists(data.lists)
       });
     }
@@ -37,14 +37,21 @@
       load_page(read);      
     }
     
-    function load_tweet(id, retweeter)
+    function load_from_twitter(id, element, error)
+    {
+      var o = $.getJSON("https://api.twitter.com/1/statuses/oembed.json?id=" + id + "&align=left&callback=?",
+        function(data){ $(element).html(data.html);});
+      if(error)
+        o.error(error);
+    }
+    
+    function load_tweet(id, retweeter, id2)
     {
       if(id){
-      $.getJSON("https://api.twitter.com/1/statuses/oembed.json?id=" + id + "&align=left&callback=?",
-        function(data){ $('#tweet').html(data.html);}).error(
-          function(a,b,c){ 
-            $.getJSON("/formatted", function(data){ $('#tweet').html(data.html) });
-          });
+        load_from_twitter(id, '#tweet', 
+        function(a,b,c){ 
+          $.getJSON("/formatted", function(data){ $(element).html(data.html) });
+        });
       }else{        
         clear_node('tweet');
       }
@@ -52,6 +59,11 @@
         $('#rt').html('@' + retweeter + ' retweeted');
       }else{
         clear_node('rt');
+      }
+      if(id2){
+        load_from_twitter(id2, '#tweet2');
+      }else{        
+        clear_node('tweet2');
       }
     }
     
@@ -134,6 +146,7 @@
           <div id='status'></div>
       <td><div id='rt'></div>  
           <div id='tweet'></div>  
+          <div id='tweet2'></div>  
     </tr>
   </table>
 </body>

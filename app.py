@@ -29,6 +29,11 @@ class Reader:
         if rt:
             M['id'] = rt
             M['retweeter'] = tweet['handle']
+        else:
+            st = tweeter.is_subtweet(tweet)
+            if st:
+                M['id2'] = st        
+
         return M
 
 reader = Reader()
