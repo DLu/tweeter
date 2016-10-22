@@ -50,7 +50,7 @@
       if(id){
         load_from_twitter(id, '#tweet', 
         function(a,b,c){ 
-          $.getJSON("/formatted", function(data){ $(element).html(data.html) });
+          $.getJSON("/formatted", function(data){ $('#tweet').html(data.html) });
         });
       }else{        
         clear_node('tweet');

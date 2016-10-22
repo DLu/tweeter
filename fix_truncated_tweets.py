@@ -19,7 +19,6 @@ for tweet in twit.all_tweets():
             print b
         print
     tweet.update(t2)
-    break
 
 twit.write()
 
