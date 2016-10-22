@@ -1,4 +1,5 @@
 import twitter
+from twitter.twitter_utils import enf_type
 import yaml
 import os
 from dateutil import parser
@@ -6,7 +7,9 @@ import re
 
 RT_P = 'https://twitter.com/[^/]+/status/(\d+)'
 RETWEET_PATTERN = re.compile(RT_P)
-SUBTWEET_PATTERN = re.compile('.*'+RT_P)
+SUBTWEET_PATTERN = re.compile('.+'+RT_P, re.DOTALL)
+
+WEB_P = 'https://twitter.com/i/web/status/'
 
 def copy_fields(obj, D, fields):
     for field in fields:
@@ -27,6 +30,9 @@ def is_subtweet(tweet):
     m = SUBTWEET_PATTERN.match(tweet['text'])
     if m:
         return m.group(1)
+        
+def needs_extension(text):
+    return WEB_P in text
 
 class Tweeter:
     def __init__(self):
@@ -96,6 +102,18 @@ class Tweeter:
     def get_list_tweets(self, list_id, since_id=None, max_id=None, count=200):
         return self.api.GetListTimeline(list_id=list_id, since_id=since_id, max_id=max_id, count=count)
         
+    def get_extended_status(self, status_id):
+        url = '%s/statuses/show.json' % (self.api.base_url)
+
+        parameters = {
+            'id': enf_type('status_id', int, status_id),
+            'tweet_mode': 'extended'
+        }
+        resp = self.api._RequestUrl(url, 'GET', data=parameters)
+        data = self.api._ParseAndCheckTwitter(resp.content.decode('utf-8'))
+        data['text'] = data['full_text']
+        return twitter.Status.NewFromJsonDict(data)
+        
     # DB METHODS ###############################################################
     def update_lists(self):
         slugs = []
@@ -153,6 +171,8 @@ class Tweeter:
         max_id = None
         for x in raw_tweets:
             self.process_user(x.user)
+            if needs_extension(x.text):
+                x = self.get_extended_status(x['id_str'])
             tweet = self.clean_tweet(x)
             if tweet not in self.tweets[slug]:
                 self.tweets[slug].append(tweet)
