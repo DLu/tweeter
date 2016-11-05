@@ -134,6 +134,7 @@
       $.getJSON("/update",
         function(data){ 
           $('#status').html(data.message);
+          load_page();
           });
     }
     
