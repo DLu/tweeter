@@ -221,6 +221,16 @@ class Tweeter:
         for tweet in self.tweets[slug]:
             counts[tweet['handle']]+=1
         return dict(counts)
+        
+    def get_user_list(self, user):
+        info = self.get_user(user)
+        if 'list' in info:
+            return info['list']
+        for slug, tweets in self.tweets.iteritems():
+            for tweet in tweets:
+                if tweet['handle'] == user:
+                    info['list'] = slug
+                    return slug
 
     def mark_as_read(self, tweet, slug=None):
         if slug is None:
@@ -228,7 +238,16 @@ class Tweeter:
                 if tweet in tweets:
                     break
         self.tweets[slug].remove(tweet)
-        
+
+    def mark_all(self, user):
+        slug = self.get_user_list(user)
+        tweets = []
+        for tweet in self.tweets[slug]:
+            if tweet['handle'] == user:
+                tweets.append(tweet)
+        for tweet in tweets:
+            self.tweets[slug].remove(tweet)
+
     def get_tweet(self, slug=None, username=None, skipped={}, include_retweets=True):
         if slug:
             keys = [slug]

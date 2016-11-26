@@ -77,7 +77,7 @@
       }
     }
     
-    function create_option(name, size, selected, parent_name)
+    function create_option(name, size, selected, parent_name, clear_link)
     {
       var line = document.createElement('li');
       var input = document.createElement('input');
@@ -92,8 +92,16 @@
       line.appendChild(input);
       var label = document.createElement('label');
       label.setAttribute('for', name);
-      label.appendChild(document.createTextNode(name + " (" + size + ")"));
+      label.appendChild(document.createTextNode(name + " (" + size + ") "));
       line.appendChild(label);
+      
+      if(clear_link){
+        var button = document.createElement('button');
+        button.setAttribute('type', 'button');
+        button.onclick = function() { query_mark(name) };
+        button.appendChild(document.createTextNode('x'));
+        line.appendChild(button);
+      }
       
       var div = document.createElement('div');
       div.setAttribute('class', 'check');
@@ -128,7 +136,7 @@
         var size = L[i][1];
         total += size;
         
-        ul.appendChild(create_option(name, size, selected, parent_name));
+        ul.appendChild(create_option(name, size, selected, parent_name, element_name=='users'));
       }
       ul.insertBefore(create_option('all', total, selected, parent_name), ul.childNodes[0]);
       
@@ -156,6 +164,15 @@
           $('#status').html(data.message);
           load_page();
           });
+    }
+    
+    function query_mark(name){
+      if (confirm('Are you sure you mark ' + name + ' as read?')) {
+        $.getJSON("/mark?user=" + name,
+          function(data){ 
+            load_page();
+          });
+      }
     }
 
   $(function() {

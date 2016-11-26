@@ -19,6 +19,9 @@ class Reader:
             self.skipped.add(self.current['id_str'])
         self.current = None
         
+    def mark_all(self, user):
+        self.twit.mark_all(user)
+        
     def get_tweet(self, chosen_list=None, username=None, include_retweets=False):
         tweet = self.twit.get_tweet(chosen_list, username, self.skipped, include_retweets=include_retweets)
         self.current = tweet
@@ -88,6 +91,12 @@ def clear():
     n = len(reader.skipped)
     reader.skipped = set()
     return jsonify({'message': 'Cleared %d!'%n})
+
+@app.route('/mark')
+def mark():
+    user = request.args.get('user')
+    reader.mark_all(user=user)
+    return jsonify({})
 
 if __name__ == '__main__':
     try:
