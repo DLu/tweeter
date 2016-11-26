@@ -46,6 +46,7 @@ class Tweeter:
                           access_token_secret=config['token_secret'])
                           
         self.root = config['folder']
+        self.mute_filters = config.get('mute', [])
         if not os.path.exists(self.root):
             os.mkdir(self.root)
         
@@ -175,6 +176,8 @@ class Tweeter:
             if needs_extension(x.text):
                 x = self.get_extended_status(x['id_str'])
             tweet = self.clean_tweet(x)
+            if self.should_mute_tweet(tweet):
+                continue
             if tweet not in self.tweets[slug]:
                 self.tweets[slug].append(tweet)
             print tweet['id_str'], tweet['text']
@@ -187,6 +190,12 @@ class Tweeter:
         elif first_id:
             info['since_id'] = first_id
             info.pop('max_id', None)
+    
+    def should_mute_tweet(self, tweet):
+        for needle in self.mute_filters:
+            if needle in tweet['text']:
+                return True
+        return False
             
     def get_tweets(self):
         for slug in self.lists:
