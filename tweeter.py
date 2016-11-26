@@ -220,7 +220,7 @@ class Tweeter:
                     break
         self.tweets[slug].remove(tweet)
         
-    def get_tweet(self, slug=None, username=None, skipped={}):
+    def get_tweet(self, slug=None, username=None, skipped={}, include_retweets=True):
         if slug:
             keys = [slug]
         else:
@@ -231,6 +231,8 @@ class Tweeter:
                 if tweet['id_str'] in skipped:
                     continue
                 elif username and username!=tweet['handle']:
+                    continue
+                elif not include_retweets and is_retweet(tweet):
                     continue
                 else:
                     return tweet

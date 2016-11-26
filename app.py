@@ -19,8 +19,8 @@ class Reader:
             self.skipped.add(self.current['id_str'])
         self.current = None
         
-    def get_tweet(self, chosen_list=None, username=None):
-        tweet = self.twit.get_tweet(chosen_list, username, self.skipped)
+    def get_tweet(self, chosen_list=None, username=None, include_retweets=False):
+        tweet = self.twit.get_tweet(chosen_list, username, self.skipped, include_retweets=include_retweets)
         self.current = tweet
         if not self.current:
             return {}
@@ -52,7 +52,8 @@ def interact():
         slug = None
     if username=='all':
         username = None
-    M = reader.get_tweet(slug, username)
+    rt = request.args.get('rt', False)=='true'
+    M = reader.get_tweet(slug, username, rt)
     M['lists'] = reader.twit.get_sizes()
     if slug:
         M['users'] = sorted(reader.twit.get_user_counts(slug).items())

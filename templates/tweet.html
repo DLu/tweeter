@@ -21,6 +21,10 @@
       var user = current_value('users_select');
       if(user)
         params['user'] = user;
+        
+      var rt = document.getElementById("retweets").checked;
+      if(rt)
+        params['rt'] = true;
 
       $.getJSON('/interact', params, function(data) {
         load_tweet(data.id, data.retweeter, data.id2);
@@ -157,6 +161,7 @@
           <button type="button" onclick="save_to_disk()">Write</button>
           <div id='lists' class="lists"></div>
           <div id='users' class="lists"></div>
+          <label><input type="checkbox" id="retweets" checked="true"/>Retweets</label>
           <div id='status'></div>
       <td><div id='rt'></div>  
           <div id='tweet'></div>  
