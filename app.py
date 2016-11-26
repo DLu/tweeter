@@ -83,6 +83,12 @@ def save():
     reader.twit.write()
     return jsonify({'message': 'Written!'})
 
+@app.route('/clear')
+def clear():
+    n = len(reader.skipped)
+    reader.skipped = set()
+    return jsonify({'message': 'Cleared %d!'%n})
+
 if __name__ == '__main__':
     try:
         app.run(host='0.0.0.0')

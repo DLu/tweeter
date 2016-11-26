@@ -150,6 +150,14 @@
           });
     }
     
+    function clear_progress(){
+      $.getJSON("/clear",
+        function(data){ 
+          $('#status').html(data.message);
+          load_page();
+          });
+    }
+
   $(function() {
     load_page();
   });
@@ -160,6 +168,7 @@
     <tr>
       <td><button type="button" onclick="update()">Update</button>
           <button type="button" onclick="save_to_disk()">Write</button>
+          <button type="button" onclick="clear_progress()">Clear Progress</button>
           <div id='lists' class="lists"></div>
           <div id='users' class="lists"></div>
           <label><input type="checkbox" id="retweets" checked="true"/>Retweets</label>
