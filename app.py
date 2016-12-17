@@ -2,7 +2,10 @@
 from flask import Flask, render_template, request, jsonify, send_from_directory
 import tweeter
 import os.path
+import re
 app = Flask(__name__)
+
+INSTAGRAM_PATTERN = re.compile('https://instagram.com/p/([^/]*)/')
 
 class Reader:
     def __init__(self):
@@ -35,7 +38,9 @@ class Reader:
             st = tweeter.is_subtweet(tweet)
             if st:
                 M['id2'] = st        
-
+        m = INSTAGRAM_PATTERN.search(tweet['text'])
+        if m:
+            M['extra_img'] = 'https://instagram.com/p/%s/media/?size=t'%m.group(1)
         return M
 
 reader = Reader()

@@ -29,6 +29,7 @@
 
       $.getJSON('/interact', params, function(data) {
         load_tweet(data.id, data.retweeter, data.id2);
+        load_img(data.extra_img);
         load_lists(data.lists, 'lists');
         load_lists(data.users, 'users');
       });
@@ -75,6 +76,15 @@
       }else{        
         clear_node('tweet2');
       }
+    }
+    
+    function load_img(extra_img)
+    {
+        if(extra_img){
+            $('#tweet_img').src(extra_img);
+        }else{
+            $('#tweet_img').src('');
+        }
     }
     
     function create_option(name, size, selected, parent_name, clear_link)
@@ -193,6 +203,7 @@
       <td><div id='rt'></div>  
           <div id='tweet'></div>  
           <div id='tweet2'></div>  
+          <img id='tweet_img'/>
     </tr>
   </table>
 </body>
