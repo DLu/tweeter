@@ -80,10 +80,11 @@
     
     function load_img(extra_img)
     {
+        var img = document.getElementById('tweet_img');
         if(extra_img){
-            $('#tweet_img').src(extra_img);
+            img.setAttribute('src', extra_img);
         }else{
-            $('#tweet_img').src('');
+            img.setAttribute('src', '');
         }
     }
     

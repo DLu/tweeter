@@ -40,7 +40,7 @@ class Reader:
                 M['id2'] = st        
         m = INSTAGRAM_PATTERN.search(tweet['text'])
         if m:
-            M['extra_img'] = 'https://instagram.com/p/%s/media/?size=t'%m.group(1)
+            M['extra_img'] = 'https://instagram.com/p/%s/media/?size=m'%m.group(1)
         return M
 
 reader = Reader()
