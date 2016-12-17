@@ -62,6 +62,7 @@ def interact():
     rt = request.args.get('rt', False)=='true'
     M = reader.get_tweet(slug, username, rt)
     M['lists'] = reader.twit.get_sizes()
+    M['skipped'] = len(reader.twit.skipped)
     if slug:
         M['users'] = sorted(reader.twit.get_user_counts(slug).items())
     return jsonify(M)

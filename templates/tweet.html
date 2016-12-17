@@ -30,7 +30,7 @@
       $.getJSON('/interact', params, function(data) {
         load_tweet(data.id, data.retweeter, data.id2);
         load_img(data.extra_img);
-        load_lists(data.lists, 'lists');
+        load_lists(data.lists, 'lists', data.skipped);
         load_lists(data.users, 'users');
       });
     }
@@ -88,7 +88,7 @@
         }
     }
     
-    function create_option(name, size, selected, parent_name, clear_link)
+    function create_option(name, size, selected, parent_name, clear_link, second_text='')
     {
       var line = document.createElement('li');
       var input = document.createElement('input');
@@ -104,6 +104,12 @@
       var label = document.createElement('label');
       label.setAttribute('for', name);
       label.appendChild(document.createTextNode(name + " (" + size + ") "));
+      if(second_text){
+        var sp = document.createElement('span');
+        sp.appendChild(document.createTextNode(second_text));
+        sp.setAttribute('class', 'fade');
+        label.appendChild(sp);
+      }
       line.appendChild(label);
       
       if(clear_link){
@@ -130,7 +136,7 @@
       return 'all';
     }
     
-    function load_lists(L, element_name)
+    function load_lists(L, element_name, count)
     {
       var parent_name = element_name + "_select";
       var selected = current_value(parent_name);
@@ -149,7 +155,7 @@
         
         ul.appendChild(create_option(name, size, selected, parent_name, element_name=='users'));
       }
-      ul.insertBefore(create_option('all', total, selected, parent_name), ul.childNodes[0]);
+      ul.insertBefore(create_option('all', total, selected, parent_name, undefined, second_text=total-count), ul.childNodes[0]);
       
       node.appendChild(ul);
     }
