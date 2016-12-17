@@ -35,6 +35,9 @@ def is_subtweet(tweet):
 def needs_extension(text):
     return WEB_P in text
 
+def sort_by_date(tweets):
+    return sorted(tweets, key=lambda t: parser.parse(t['created_at']))
+
 class Tweeter:
     def __init__(self):
         config_fn = os.path.join( os.path.dirname(__file__), 'config.yaml')
@@ -259,20 +262,26 @@ class Tweeter:
 
     def get_tweet(self, slug=None, username=None, include_retweets=True):
         if slug:
-            keys = [slug]
-        else:
-            keys = self.lists.keys()
+            return self.get_tweet_from_list(slug, username, include_retweets)
         
-        for key in keys:
-            for tweet in sorted(self.tweets[key], key=lambda t: parser.parse(t['created_at'])):
-                if tweet['id_str'] in self.skipped:
-                    continue
-                elif username and username!=tweet['handle']:
-                    continue
-                elif not include_retweets and is_retweet(tweet):
-                    continue
-                else:
-                    return tweet
+        tweets = []
+        for key in self.lists.keys():
+            tweet = self.get_tweet_from_list(key, username, include_retweets)
+            if tweet:
+                tweets.append(tweet)
+        if len(tweets)>0:
+            return sort_by_date(tweets)[0]
+        
+    def get_tweet_from_list(self, slug, username=None, include_retweets=True):
+        for tweet in sort_by_date(self.tweets[slug]):
+            if tweet['id_str'] in self.skipped:
+                continue
+            elif username and username!=tweet['handle']:
+                continue
+            elif not include_retweets and is_retweet(tweet):
+                continue
+            else:
+                return tweet
 
     def clear_skips(self):
         n = len(self.skipped)
