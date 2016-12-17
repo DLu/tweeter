@@ -7,7 +7,6 @@ app = Flask(__name__)
 class Reader:
     def __init__(self):
         self.twit = tweeter.Tweeter()
-        self.skipped = set()
         self.current = None
         
     def post(self, read):
@@ -16,14 +15,14 @@ class Reader:
         if read:
             self.twit.mark_as_read(self.current)
         else:
-            self.skipped.add(self.current['id_str'])
+            self.twit.skip_tweet(self.current)
         self.current = None
         
     def mark_all(self, user):
         self.twit.mark_all(user)
         
     def get_tweet(self, chosen_list=None, username=None, include_retweets=False):
-        tweet = self.twit.get_tweet(chosen_list, username, self.skipped, include_retweets=include_retweets)
+        tweet = self.twit.get_tweet(chosen_list, username, include_retweets=include_retweets)
         self.current = tweet
         if not self.current:
             return {}
@@ -88,8 +87,7 @@ def save():
 
 @app.route('/clear')
 def clear():
-    n = len(reader.skipped)
-    reader.skipped = set()
+    n = reader.twit.clear_skips()
     return jsonify({'message': 'Cleared %d!'%n})
 
 @app.route('/mark')

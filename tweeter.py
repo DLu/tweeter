@@ -55,7 +55,13 @@ class Tweeter:
             self.meta = yaml.load(open(main_fn))
         else:
             self.meta = {}
-        
+
+        skipped_fn = os.path.join(self.root, 'skipped.yaml')
+        if os.path.exists(skipped_fn):
+            self.skipped = set(yaml.load(open(skipped_fn)))
+        else:
+            self.skipped = set()
+
         self.lists = {}
         self.tweets = {}
         for slug in self.meta.get('lists', []):
@@ -239,6 +245,9 @@ class Tweeter:
                     break
         self.tweets[slug].remove(tweet)
 
+    def skip_tweet(self, tweet):
+        self.skipped.add(tweet['id_str'])
+
     def mark_all(self, user):
         slug = self.get_user_list(user)
         tweets = []
@@ -248,7 +257,7 @@ class Tweeter:
         for tweet in tweets:
             self.tweets[slug].remove(tweet)
 
-    def get_tweet(self, slug=None, username=None, skipped={}, include_retweets=True):
+    def get_tweet(self, slug=None, username=None, include_retweets=True):
         if slug:
             keys = [slug]
         else:
@@ -256,7 +265,7 @@ class Tweeter:
         
         for key in keys:
             for tweet in sorted(self.tweets[key], key=lambda t: parser.parse(t['created_at'])):
-                if tweet['id_str'] in skipped:
+                if tweet['id_str'] in self.skipped:
                     continue
                 elif username and username!=tweet['handle']:
                     continue
@@ -265,10 +274,16 @@ class Tweeter:
                 else:
                     return tweet
 
+    def clear_skips(self):
+        n = len(self.skipped)
+        self.skipped = set()
+        return n
 
     def write(self):
         main_fn = os.path.join(self.root, 'tweeter.yaml')
         yaml.dump(self.meta, open(main_fn, 'w'))
+        skipped_fn = os.path.join(self.root, 'skipped.yaml')
+        yaml.dump(list(self.skipped), open(skipped_fn, 'w'))
         for slug, info in self.lists.iteritems():
             yaml.dump(info, open(self.get_list_info(slug), 'w'))
             yaml.dump(self.tweets[slug], open(self.get_tweet_info(slug), 'w'))
