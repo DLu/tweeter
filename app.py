@@ -5,7 +5,7 @@ import os.path
 import re
 app = Flask(__name__)
 
-INSTAGRAM_PATTERN = re.compile('https://instagram.com/p/([^/]*)/')
+INSTAGRAM_PATTERN = re.compile('https://(?:www\.)?instagram.com/p/([^/]*)/')
 
 class Reader:
     def __init__(self):
@@ -39,7 +39,9 @@ class Reader:
             if st:
                 M['id2'] = st        
         m = INSTAGRAM_PATTERN.search(tweet['text'])
+        print tweet['text']
         if m:
+            print m
             M['extra_img'] = 'https://instagram.com/p/%s/media/?size=m'%m.group(1)
         return M
 
