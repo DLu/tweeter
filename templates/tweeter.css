@@ -6,11 +6,6 @@ body {
   font-family: 'Roboto Condensed', sans-serif;
 }
 
-.fade {
-  color: #777777;
-  font-size: 70%;
-}
-
 .EmbeddedTweet {
     overflow: hidden;
     cursor: pointer;
