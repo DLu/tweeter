@@ -201,6 +201,9 @@ class Tweeter:
             info.pop('max_id', None)
     
     def should_mute_tweet(self, tweet):
+        at_handle = '@' + tweet['handle']
+        if at_handle in self.mute_filters:
+            return True
         for needle in self.mute_filters:
             if needle in tweet['text']:
                 return True
