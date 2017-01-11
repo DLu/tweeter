@@ -6,6 +6,10 @@ body {
   font-family: 'Roboto Condensed', sans-serif;
 }
 
+td {
+  vertical-align: top;
+}
+
 .EmbeddedTweet {
     overflow: hidden;
     cursor: pointer;
