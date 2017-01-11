@@ -4,6 +4,7 @@
   <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
   <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="tweeter.css">
+  <link rel="stylesheet" type="text/css" href="https://ghinda.net/css-toggle-switch/dist/toggle-switch.css">
   <script type=text/javascript>
     function clear_node(node_name)
     {
@@ -23,9 +24,7 @@
       if(user)
         params['user'] = user;
         
-      var rt = document.getElementById("retweets").checked;
-      if(rt)
-        params['rt'] = true;
+      params['mode'] = $('input[name=mode_input]:checked').val();
 
       $.getJSON('/interact', params, function(data) {
         load_tweet(data.id, data.retweeter, data.id2);
@@ -193,6 +192,28 @@
     }
 
   $(function() {
+    var node = document.getElementById('mode_switch');
+    var modes = ["fresh", "full", "all"];
+    for(var i=0;i<modes.length;i++){
+      var mode = modes[i];
+      var input = document.createElement('input');
+      input.setAttribute('type', 'radio');
+      input.setAttribute('name', 'mode_input');
+      input.setAttribute('id', mode);
+      input.setAttribute('value', mode);
+      input.setAttribute('onclick', 'load_page()');
+      if(i==0){
+        input.setAttribute('checked', 'checked');
+      }
+      node.appendChild(input);
+      
+      var label = document.createElement('label');
+      label.setAttribute('for', mode);
+      label.appendChild(document.createTextNode(mode));
+      node.appendChild(label);
+    }
+    
+    node.appendChild(document.createElement('a'));
     load_page();
   });
   </script>
@@ -200,12 +221,15 @@
 <body>
   <table width="100%">
     <tr>
-      <td><button type="button" onclick="update()">Update</button>
+      <td width="20%"><button type="button" onclick="update()">Update</button>
           <button type="button" onclick="save_to_disk()">Write</button>
           <button type="button" onclick="clear_progress()">Clear Progress</button>
           <div id='lists' class="lists"></div>
           <div id='users' class="lists"></div>
-          <label><input type="checkbox" id="retweets" checked="true"/>Retweets</label>
+          
+          <div id="mode_switch" class="switch-toggle switch-3 switch-candy">
+          </div>
+          
           <div id='status'></div>
       <td><div id='rt'></div>  
           <div id='tweet'></div>  

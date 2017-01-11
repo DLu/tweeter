@@ -219,16 +219,31 @@ class Tweeter:
     def clear_tweets(self, name):
         self.tweets[name] = []
         
-    def get_sizes(self):
+    def is_valid_tweet(self, tweet, mode):
+        if mode=='all':
+            return True
+        if tweet['id_str'] in self.skipped:
+            return False
+        if mode=='fresh' and is_retweet(tweet):
+            return False
+        return True
+        
+    def get_sizes(self, mode='fresh'):
         sizes = []
         for name in self.lists:
-            sizes.append( (name, len(self.tweets[name])))
+            c = 0
+            for tweet in self.tweets[name]:
+                if self.is_valid_tweet(tweet, mode):
+                    c+=1
+            if c>0:
+                sizes.append( (name, c))
         return sizes
     
-    def get_user_counts(self, slug):
+    def get_user_counts(self, slug, mode='fresh'):
         counts = collections.defaultdict(int)
         for tweet in self.tweets[slug]:
-            counts[tweet['handle']]+=1
+            if self.is_valid_tweet(tweet, mode):
+                counts[tweet['handle']]+=1
         return dict(counts)
         
     def get_user_list(self, user):
@@ -260,25 +275,23 @@ class Tweeter:
         for tweet in tweets:
             self.tweets[slug].remove(tweet)
 
-    def get_tweet(self, slug=None, username=None, include_retweets=True):
+    def get_tweet(self, slug=None, username=None, mode='fresh'):
         if slug:
-            return self.get_tweet_from_list(slug, username, include_retweets)
+            return self.get_tweet_from_list(slug, username, mode)
         
         tweets = []
         for key in self.lists.keys():
-            tweet = self.get_tweet_from_list(key, username, include_retweets)
+            tweet = self.get_tweet_from_list(key, username, mode)
             if tweet:
                 tweets.append(tweet)
         if len(tweets)>0:
             return sort_by_date(tweets)[0]
         
-    def get_tweet_from_list(self, slug, username=None, include_retweets=True):
+    def get_tweet_from_list(self, slug, username=None, mode='fresh'):
         for tweet in sort_by_date(self.tweets[slug]):
-            if tweet['id_str'] in self.skipped:
+            if not self.is_valid_tweet(tweet, mode):
                 continue
             elif username and username!=tweet['handle']:
-                continue
-            elif not include_retweets and is_retweet(tweet):
                 continue
             else:
                 return tweet

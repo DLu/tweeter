@@ -24,8 +24,8 @@ class Reader:
     def mark_all(self, user):
         self.twit.mark_all(user)
         
-    def get_tweet(self, chosen_list=None, username=None, include_retweets=False):
-        tweet = self.twit.get_tweet(chosen_list, username, include_retweets=include_retweets)
+    def get_tweet(self, chosen_list=None, username=None, mode='fresh'):
+        tweet = self.twit.get_tweet(chosen_list, username, mode=mode)
         self.current = tweet
         if not self.current:
             return {}
@@ -61,12 +61,11 @@ def interact():
         slug = None
     if username=='all':
         username = None
-    rt = request.args.get('rt', False)=='true'
-    M = reader.get_tweet(slug, username, rt)
-    M['lists'] = reader.twit.get_sizes()
-    M['skipped'] = len(reader.twit.skipped)
+    mode = request.args.get('mode', 'fresh')
+    M = reader.get_tweet(slug, username, mode)
+    M['lists'] = reader.twit.get_sizes(mode)
     if slug:
-        M['users'] = sorted(reader.twit.get_user_counts(slug).items())
+        M['users'] = sorted(reader.twit.get_user_counts(slug, mode).items())
     return jsonify(M)
     
 @app.route('/tweeter.css')
