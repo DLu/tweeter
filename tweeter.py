@@ -31,6 +31,10 @@ def is_subtweet(tweet):
     m = SUBTWEET_PATTERN.match(tweet['text'])
     if m:
         return m.group(1)
+    if 'rt_text' in tweet:
+        m = SUBTWEET_PATTERN.match(tweet['rt_text'])
+        if m:
+            return m.group(1)
         
 def needs_extension(text):
     return WEB_P in text
@@ -169,6 +173,18 @@ class Tweeter:
                 tweet['text'] = tweet['text'].replace( url.url, url.expanded_url)
         return tweet
 
+    def recurse(self, tweet):
+        id_str = is_retweet(tweet)
+        if id_str and 'rt' not in tweet:
+            rt = self.get_extended_status(id_str)
+            c_rt = self.clean_tweet(rt)
+            tweet['rt'] = id_str
+            tweet['rt_text'] = c_rt['text']
+        
+        id_str2 = is_subtweet(tweet)
+        if 'id2' not in tweet:
+            tweet['id2'] = str(id_str2)
+
     def update_list(self, slug, count=150):
         info = self.lists[slug]
         max_id = info.get('max_id', None)
@@ -185,6 +201,7 @@ class Tweeter:
             if needs_extension(x.text):
                 x = self.get_extended_status(x['id_str'])
             tweet = self.clean_tweet(x)
+            self.recurse(tweet)
             if self.should_mute_tweet(tweet):
                 continue
             if tweet not in self.tweets[slug]:
@@ -203,6 +220,8 @@ class Tweeter:
     def should_mute_tweet(self, tweet):
         for needle in self.mute_filters:
             if needle in tweet['text']:
+                return True
+            if 'rt_text' in tweet and needle in tweet['rt_text']:
                 return True
         return False
             

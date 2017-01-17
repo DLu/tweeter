@@ -30,18 +30,14 @@ class Reader:
         if not self.current:
             return {}
         M = {'id': self.current['id_str']}
-        rt = tweeter.is_retweet(tweet)
+        rt = tweet.get('rt', None)
         if rt:
             M['id'] = rt
             M['retweeter'] = tweet['handle']
-        else:
-            st = tweeter.is_subtweet(tweet)
-            if st:
-                M['id2'] = st        
-        m = INSTAGRAM_PATTERN.search(tweet['text'])
-        print tweet['text']
+        if 'id2' in tweet:
+            M['id2'] = tweet['id2']
+        m = INSTAGRAM_PATTERN.search(tweet['text'] + ' ' + tweet.get('rt_text', ''))
         if m:
-            print m
             M['extra_img'] = 'https://instagram.com/p/%s/media/?size=m'%m.group(1)
         return M
 
