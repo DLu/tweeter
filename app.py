@@ -11,6 +11,7 @@ class Reader:
     def __init__(self):
         self.twit = tweeter.Tweeter()
         self.current = None
+        self.clear_message = None
         
     def post(self, read):
         if self.current is None:
@@ -62,6 +63,12 @@ def interact():
     M['lists'] = reader.twit.get_sizes(mode)
     if slug:
         M['users'] = sorted(reader.twit.get_user_counts(slug, mode).items())
+    if reader.clear_message is not None:
+        if reader.clear_message == 0:
+            reader.clear_message = None
+            M['message'] = ' '
+        else:
+            reader.clear_message-=1
     return jsonify(M)
     
 @app.route('/tweeter.css')
@@ -81,6 +88,7 @@ def favicon():
 @app.route('/update')
 def update():
     reader.twit.get_tweets()
+    reader.clear_message = 5
     return jsonify({'message': 'Updated!'})
 
 @app.route('/write')

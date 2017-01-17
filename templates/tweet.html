@@ -31,6 +31,9 @@
         load_img(data.extra_img);
         load_lists(data.lists, 'lists');
         load_lists(data.users, 'users');
+        if(data.message){
+          $('#status').html(data.message);
+        }
       });
     }
   
