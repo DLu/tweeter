@@ -182,7 +182,7 @@ class Tweeter:
             tweet['rt_text'] = c_rt['text']
         
         id_str2 = is_subtweet(tweet)
-        if 'id2' not in tweet:
+        if id_str2 and 'id2' not in tweet:
             tweet['id2'] = str(id_str2)
 
     def update_list(self, slug, count=150):
