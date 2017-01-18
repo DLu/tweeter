@@ -1,9 +1,12 @@
 #!/usr/bin/python
 from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask_mobility import Mobility
+
 import tweeter
 import os.path
 import re
 app = Flask(__name__)
+Mobility(app)
 
 INSTAGRAM_PATTERN = re.compile('https://(?:www\.)?instagram.com/p/([^/]*)/')
 
@@ -46,6 +49,8 @@ reader = Reader()
 
 @app.route('/')
 def index():
+    if request.MOBILE:
+        return render_template('m_tweet.html')
     return render_template('tweet.html')
 
 @app.route('/interact')
