@@ -71,8 +71,9 @@ class Tweeter:
             self.skipped = set()
 
         self.lists = {}
+        self.ordered_lists = self.meta.get('lists', [])
         self.tweets = {}
-        for slug in self.meta.get('lists', []):
+        for slug in self.ordered_lists:
             fn = self.get_list_info(slug)
             if os.path.exists(fn):
                 D = yaml.load(open(fn))
@@ -216,11 +217,11 @@ class Tweeter:
     def update_list(self, slug, count=150):
         info = self.lists[slug]
         max_id = info.get('max_id', None)
-        raw_tweets = self.get_list_tweets(list_id=info['id'], since_id=info['since_id'], max_id=max_id, count=count)
+        raw_tweets = self.get_list_tweets(list_id=info['id'], since_id=info.get('since_id', None), max_id=max_id, count=count)
         print len(raw_tweets)
         if len(raw_tweets)==1 and max_id is not None:
             del info['max_id']
-            raw_tweets = self.get_list_tweets(list_id=info['id'], since_id=info['since_id'], count=count)
+            raw_tweets = self.get_list_tweets(list_id=info['id'], since_id=info.get('since_id', None), count=count)
             print len(raw_tweets)
         first_id = None
         max_id = None
@@ -278,7 +279,7 @@ class Tweeter:
         
     def get_sizes(self, mode='fresh'):
         sizes = []
-        for name in self.lists:
+        for name in self.ordered_lists:
             c = 0
             for tweet in self.tweets[name]:
                 if self.is_valid_tweet(tweet, mode):
