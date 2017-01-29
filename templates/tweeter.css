@@ -43,7 +43,7 @@ td {
     border-radius: 4px;
 }
 
-button {
+button.interface {
   position: relative;
   overflow: hidden;
   padding: 10px 22px;
@@ -57,7 +57,7 @@ button {
   border-radius: 12px;
 }
 
-button:after {
+button.interface:after {
   content: '';
   display: block;
   position: absolute;
@@ -87,16 +87,16 @@ button:after {
   }
 }
 
-button:not(:active):after {
+button.interface:not(:active):after {
   animation: ripple 1s ease-out;
 }
 
 /* fixes initial animation run, without user input, on page load.
  */
-button:after {
+button.interface:after {
   visibility: hidden;
 }
 
-button:focus:after {
+button.interface:focus:after {
   visibility: visible;
 }
