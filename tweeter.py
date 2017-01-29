@@ -5,6 +5,7 @@ import os
 from dateutil import parser
 import re
 import collections
+import threading
 
 RT_P = 'https://twitter.com/[^/]+/status/(\d+)'
 RETWEET_PATTERN = re.compile(RT_P)
@@ -198,6 +199,7 @@ class Tweeter:
                     (is_subtweet(tweet) and 'id2' not in tweet):
                     self.recurse(tweet)
                     rec+=1
+        print '%d extensions, %d recursions'%(ext, rec)
         return ext, rec
 
     def update_list(self, slug, count=150):
@@ -216,7 +218,6 @@ class Tweeter:
             if needs_extension(x.text):
                 x = self.get_extended_status(x['id_str'])
             tweet = self.clean_tweet(x)
-            self.recurse(tweet)
             if self.should_mute_tweet(tweet):
                 continue
             if tweet not in self.tweets[slug]:
@@ -243,6 +244,8 @@ class Tweeter:
     def get_tweets(self):
         for slug in self.lists:
             self.update_list(slug)
+        t = threading.Thread(target=self.fix_up_tweets)
+        t.start()
 
     def all_tweets(self):
         all_tweets = []
