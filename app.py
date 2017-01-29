@@ -94,11 +94,13 @@ def update():
 @app.route('/write')
 def save():
     reader.twit.write()
+    reader.clear_message = 5
     return jsonify({'message': 'Written!'})
 
 @app.route('/clear')
 def clear():
     n = reader.twit.clear_skips()
+    reader.clear_message = 5
     return jsonify({'message': 'Cleared %d!'%n})
 
 @app.route('/mark')
