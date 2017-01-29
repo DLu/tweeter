@@ -189,7 +189,10 @@ class Tweeter:
     def fix_up_tweets(self):
         ext = 0
         rec = 0
-        for tweets in self.tweets.values():
+        fil = 0
+
+        for slug, tweets in self.tweets.iteritems():
+            tweets_to_remove = []
             for tweet in tweets:
                 if needs_extension(tweet['text']):
                     t2 = self.clean_tweet(self.get_extended_status(tweet['id_str']))
@@ -199,7 +202,15 @@ class Tweeter:
                     (is_subtweet(tweet) and 'id2' not in tweet):
                     self.recurse(tweet)
                     rec+=1
-        print '%d extensions, %d recursions'%(ext, rec)
+
+                if self.should_mute_tweet(tweet):
+                    tweets_to_remove.append(tweet)
+
+            for tweet in tweets_to_remove:
+                self.tweets[slug].remove(tweet)
+                fil += 1
+
+        print '%d extensions, %d recursions, %d filtered'%(ext, rec, fil)
         return ext, rec
 
     def update_list(self, slug, count=150):
