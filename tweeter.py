@@ -289,7 +289,7 @@ class Tweeter:
         slug = self.get_user_list(user)
         tweets = []
         for tweet in self.tweets[slug]:
-            if tweet['handle'] == user:
+            if tweet['handle'] == user and tweet['id_str'] not in self.skipped:
                 tweets.append(tweet)
         for tweet in tweets:
             self.tweets[slug].remove(tweet)
