@@ -185,6 +185,21 @@ class Tweeter:
         if id_str2 and 'id2' not in tweet:
             tweet['id2'] = str(id_str2)
 
+    def fix_up_tweets(self):
+        ext = 0
+        rec = 0
+        for tweets in self.tweets.values():
+            for tweet in tweets:
+                if needs_extension(tweet['text']):
+                    t2 = self.clean_tweet(self.get_extended_status(tweet['id_str']))
+                    tweet.update(t2)
+                    ext+=1
+                if (is_retweet(tweet) and 'rt' not in tweet) or \
+                    (is_subtweet(tweet) and 'id2' not in tweet):
+                    self.recurse(tweet)
+                    rec+=1
+        return ext, rec
+
     def update_list(self, slug, count=150):
         info = self.lists[slug]
         max_id = info.get('max_id', None)
