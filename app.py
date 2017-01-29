@@ -80,11 +80,22 @@ def interact():
 def css():
     return render_template('tweeter.css')
 
+@app.route('/mobile.css')
+def css2():
+    return render_template('mobile.css')
+
 @app.route('/formatted')
 def format_tweet():
     J = dict(reader.current)
     J.update(reader.twit.get_user(J['handle']))
     return jsonify({'html': render_template('single_tweet.html', data=J)})
+    
+@app.route('/format')
+def format_tweetx():
+    J = dict(reader.current)
+    J.update(reader.twit.get_user(J['handle']))
+    return """<link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="mobile.css">""" + render_template('single_tweet.html', data=J)
 
 @app.route('/favicon.ico')
 def favicon():
