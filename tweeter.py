@@ -324,14 +324,16 @@ class Tweeter:
         for tweet in tweets:
             self.tweets[slug].remove(tweet)
 
-    def get_tweet(self, slug=None, username=None, mode='fresh'):
+    def get_tweet(self, slug=None, username=None, mode='fresh', sort='time'):
         if slug:
             return self.get_tweet_from_list(slug, username, mode)
         
         tweets = []
-        for key in self.lists.keys():
+        for key in self.ordered_lists:
             tweet = self.get_tweet_from_list(key, username, mode)
             if tweet:
+                if sort=='list':
+                    return tweet
                 tweets.append(tweet)
         if len(tweets)>0:
             return sort_by_date(tweets)[0]

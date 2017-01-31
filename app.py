@@ -25,8 +25,8 @@ class Reader:
     def mark_all(self, user):
         self.twit.mark_all(user)
         
-    def get_tweet(self, chosen_list=None, username=None, mode='fresh'):
-        tweet = self.twit.get_tweet(chosen_list, username, mode=mode)
+    def get_tweet(self, chosen_list=None, username=None, mode='fresh', sort='time'):
+        tweet = self.twit.get_tweet(chosen_list, username, mode=mode, sort=sort)
         self.current = tweet
         if not self.current:
             return {}
@@ -59,7 +59,8 @@ def interact():
     if username=='all':
         username = None
     mode = request.args.get('mode', 'fresh')
-    M = reader.get_tweet(slug, username, mode)
+    sort = request.args.get('sort', 'time')
+    M = reader.get_tweet(slug, username, mode, sort)
     M['lists'] = reader.twit.get_sizes(mode)
     if slug:
         M['users'] = sorted(reader.twit.get_user_counts(slug, mode).items())
