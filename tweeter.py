@@ -216,6 +216,8 @@ class Tweeter:
 
     def update_list(self, slug, count=150):
         info = self.lists[slug]
+        if slug not in self.tweets:
+            self.tweets = []
         max_id = info.get('max_id', None)
         raw_tweets = self.get_list_tweets(list_id=info['id'], since_id=info.get('since_id', None), max_id=max_id, count=count)
         print len(raw_tweets)
