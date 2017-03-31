@@ -317,11 +317,11 @@ class Tweeter:
     def skip_tweet(self, tweet):
         self.skipped.add(tweet['id_str'])
 
-    def mark_all(self, user):
+    def mark_all(self, user, mode='fresh'):
         slug = self.get_user_list(user)
         tweets = []
         for tweet in self.tweets[slug]:
-            if tweet['handle'] == user and tweet['id_str'] not in self.skipped:
+            if tweet['handle'] == user and self.is_valid_tweet(tweet, mode):
                 tweets.append(tweet)
         for tweet in tweets:
             self.tweets[slug].remove(tweet)

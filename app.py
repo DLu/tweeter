@@ -22,8 +22,8 @@ class Reader:
             self.twit.skip_tweet(self.current)
         self.current = None
         
-    def mark_all(self, user):
-        self.twit.mark_all(user)
+    def mark_all(self, user, mode='fresh'):
+        self.twit.mark_all(user, mode=mode)
         
     def get_tweet(self, chosen_list=None, username=None, mode='fresh', sort='time'):
         tweet = self.twit.get_tweet(chosen_list, username, mode=mode, sort=sort)
@@ -107,7 +107,8 @@ def clear():
 @app.route('/mark')
 def mark():
     user = request.args.get('user')
-    reader.mark_all(user=user)
+    mode = request.args.get('mode', 'fresh')
+    reader.mark_all(user=user, mode=mode)
     return jsonify({})
 
 if __name__ == '__main__':
