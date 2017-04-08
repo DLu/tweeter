@@ -1,6 +1,8 @@
 #!/usr/bin/python
 from flask import Flask, render_template, request, jsonify, send_from_directory
 import tweeter
+import threading
+import time
 import os.path
 import re
 app = Flask(__name__)
@@ -111,8 +113,20 @@ def mark():
     reader.mark_all(user=user, mode=mode)
     return jsonify({})
 
+running = True
+
+def writer():
+    while running:
+        for i in range(6):
+            time.sleep(5)
+            if not running:
+                break
+        reader.twit.write()
+
 if __name__ == '__main__':
     try:
+        t = threading.Thread(target=writer)
+        t.start()
         app.run(host='0.0.0.0')
-    finally:
-        reader.twit.write()
+    finally
+        running = False
