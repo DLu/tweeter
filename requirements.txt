@@ -1,2 +1,4 @@
 python-twitter
 Flask
+oauthlib>=2.0.1
+python-dateutil
