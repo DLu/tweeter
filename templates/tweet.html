@@ -94,7 +94,13 @@
         }
     }
     
-    function create_option(name, size, selected, parent_name, clear_link)
+    function change_list()
+    {
+      $('input[name="users_select"][value="all"]').prop('checked', true);
+      load_page();
+    }
+
+    function create_option(name, size, selected, parent_name, is_users)
     {
       var line = document.createElement('li');
       var input = document.createElement('input');
@@ -105,14 +111,19 @@
       if(selected==name){
         input.setAttribute('checked', 'checked');
       }
-      input.setAttribute('onclick', 'load_page()');
+      if(is_users){
+        input.setAttribute('onclick', 'load_page()');
+      }else{
+        input.setAttribute('onclick', 'change_list()');
+      }
+      
       line.appendChild(input);
       var label = document.createElement('label');
       label.setAttribute('for', name);
       label.appendChild(document.createTextNode(name + " (" + size + ") "));
       line.appendChild(label);
       
-      if(clear_link){
+      if(is_users && name!='all'){
         var button = document.createElement('button');
         button.setAttribute('type', 'button');
         button.onclick = function() { query_mark(name) };
@@ -155,7 +166,7 @@
         
         ul.appendChild(create_option(name, size, selected, parent_name, element_name=='users'));
       }
-      ul.insertBefore(create_option('all', total, selected, parent_name, undefined), ul.childNodes[0]);
+      ul.insertBefore(create_option('all', total, selected, parent_name, element_name=='users'), ul.childNodes[0]);
       
       node.appendChild(ul);
     }
