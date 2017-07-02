@@ -1,13 +1,12 @@
 #!/usr/bin/python
 from flask import Flask, render_template, request, jsonify, send_from_directory
 import tweeter
-import threading
-import time
 import os.path
 import re
 app = Flask(__name__)
 
 INSTAGRAM_PATTERN = re.compile('https://(?:www\.)?instagram.com/p/([^/]*)/')
+WRITE_COUNT = 15
 
 
 class Reader:
@@ -15,10 +14,12 @@ class Reader:
         self.twit = tweeter.Tweeter()
         self.current = None
         self.clear_message = None
+        self.count = 0
 
     def post(self, read):
         if self.current is None:
             return
+        self.count += 1
         if read:
             self.twit.mark_as_read(self.current)
         else:
@@ -44,6 +45,12 @@ class Reader:
         if m:
             M['extra_img'] = 'https://instagram.com/p/%s/media/?size=m' % m.group(1)
         return M
+
+    def needs_writing(self):
+        return self.count >= WRITE_COUNT
+
+    def reset(self):
+        self.count = 0
 
 reader = Reader()
 
@@ -75,6 +82,9 @@ def interact():
             M['message'] = ' '
         else:
             reader.clear_message -= 1
+    if reader.needs_writing():
+        reader.twit.write()
+        reader.reset()
     return jsonify(M)
 
 
@@ -123,21 +133,5 @@ def mark():
     reader.mark_all(user=user, mode=mode)
     return jsonify({})
 
-running = True
-
-
-def writer():
-    while running:
-        for i in range(6):
-            time.sleep(5)
-            if not running:
-                break
-        reader.twit.write()
-
 if __name__ == '__main__':
-    try:
-        t = threading.Thread(target=writer)
-        t.start()
-        app.run(host='0.0.0.0')
-    finally:
-        running = False
+    app.run(host='0.0.0.0', threaded=True)
