@@ -14,7 +14,7 @@
       }
       return node;
     }
-  
+
     function load_page(read=null)
     {
       var params = {list: current_value('lists_select')};
@@ -23,7 +23,7 @@
       var user = current_value('users_select');
       if(user)
         params['user'] = user;
-        
+
       params['mode'] = $('input[name=mode_input]:checked').val();
       var srt = $('input[name=sort_input]:checked').val();
       if(srt=='list'){
@@ -40,8 +40,8 @@
         }
       });
     }
-  
-  
+
+
     document.addEventListener("keydown", keyDownTextField, false);
     function keyDownTextField(e) {
       if(e.keyCode==76){
@@ -51,9 +51,9 @@
       }else{
         return;
       }
-      load_page(read);      
+      load_page(read);
     }
-    
+
     function load_from_twitter(id, element, error)
     {
       var o = $.getJSON("https://api.twitter.com/1/statuses/oembed.json?id=" + id + "&align=left&callback=?",
@@ -61,15 +61,15 @@
       if(error)
         o.error(error);
     }
-    
+
     function load_tweet(id, retweeter, id2)
     {
       if(id){
-        load_from_twitter(id, '#tweet', 
-        function(a,b,c){ 
+        load_from_twitter(id, '#tweet',
+        function(a,b,c){
           $.getJSON("/formatted", function(data){ $('#tweet').html(data.html) });
         });
-      }else{        
+      }else{
         clear_node('tweet');
       }
       if(retweeter){
@@ -79,11 +79,11 @@
       }
       if(id2){
         load_from_twitter(id2, '#tweet2');
-      }else{        
+      }else{
         clear_node('tweet2');
       }
     }
-    
+
     function load_img(extra_img)
     {
         var img = document.getElementById('tweet_img');
@@ -93,7 +93,7 @@
             img.setAttribute('src', '');
         }
     }
-    
+
     function change_list()
     {
       $('input[name="users_select"][value="all"]').prop('checked', true);
@@ -116,13 +116,13 @@
       }else{
         input.setAttribute('onclick', 'change_list()');
       }
-      
+
       line.appendChild(input);
       var label = document.createElement('label');
       label.setAttribute('for', name);
       label.appendChild(document.createTextNode(name + " (" + size + ") "));
       line.appendChild(label);
-      
+
       if(is_users && name!='all'){
         var button = document.createElement('button');
         button.setAttribute('type', 'button');
@@ -130,23 +130,23 @@
         button.appendChild(document.createTextNode('x'));
         line.appendChild(button);
       }
-      
+
       var div = document.createElement('div');
       div.setAttribute('class', 'check');
-      line.appendChild(div);    
-      return line;    
+      line.appendChild(div);
+      return line;
     }
-    
+
     function current_value(name){
       var node = document.getElementById(name);
-      if(!node) return node;      
+      if(!node) return node;
       var selector = document.querySelector('input[name="' + name + '"]:checked');
       if(selector){
         return selector.value;
       }
       return 'all';
     }
-    
+
     function load_lists(L, element_name)
     {
       var parent_name = element_name + "_select";
@@ -163,46 +163,46 @@
         var name = L[i][0];
         var size = L[i][1];
         total += size;
-        
+
         ul.appendChild(create_option(name, size, selected, parent_name, element_name=='users'));
       }
       ul.insertBefore(create_option('all', total, selected, parent_name, element_name=='users'), ul.childNodes[0]);
-      
+
       node.appendChild(ul);
     }
-    
+
     function update(){
       $.getJSON("/update",
-        function(data){ 
+        function(data){
           $('#status').html(data.message);
           load_page();
           });
     }
-    
+
     function save_to_disk(){
       $.getJSON("/write",
-        function(data){ 
+        function(data){
           $('#status').html(data.message);
           });
     }
-    
+
     function clear_progress(){
       $.getJSON("/clear",
-        function(data){ 
+        function(data){
           $('#status').html(data.message);
           load_page();
           });
     }
-    
+
     function query_mark(name){
       if (confirm('Are you sure you mark ' + name + ' as read?')) {
         $.getJSON("/mark?user=" + name + "&mode=" + $('input[name=mode_input]:checked').val(),
-          function(data){ 
+          function(data){
             load_page();
           });
       }
     }
-    
+
     function setup_switch(element, name, values){
       var node = document.getElementById(element);
       for(var i=0;i<values.length;i++){
@@ -217,7 +217,7 @@
           input.setAttribute('checked', 'checked');
         }
         node.appendChild(input);
-        
+
         var label = document.createElement('label');
         label.setAttribute('for', value);
         label.appendChild(document.createTextNode(value));
@@ -244,13 +244,13 @@
           <button type="button" class="interface" onclick="clear_progress()">Clear Progress</button>
           <div id='lists' class="lists"></div>
           <div id='users' class="lists"></div>
-          
-          
-          
+
+
+
           <div id='status'></div>
-      <td><div id='rt'></div>  
-          <div id='tweet'></div>  
-          <div id='tweet2'></div>  
+      <td><div id='rt'></div>
+          <div id='tweet'></div>
+          <div id='tweet2'></div>
           <img id='tweet_img'/>
     </tr>
   </table>
