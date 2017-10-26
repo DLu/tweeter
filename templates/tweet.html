@@ -15,11 +15,11 @@
       return node;
     }
 
-    function load_page(read=null)
+    function load_page(action=null)
     {
       var params = {list: current_value('lists_select')};
-      if(read!==null)
-        params['read'] = read;
+      if(action!==null)
+        params['action'] = action;
       var user = current_value('users_select');
       if(user)
         params['user'] = user;
@@ -45,13 +45,15 @@
     document.addEventListener("keydown", keyDownTextField, false);
     function keyDownTextField(e) {
       if(e.keyCode==76){
-        read = false;
+        action = null;
       }else if (e.keyCode==32) {
-        read = true;
+        action = 'read';
+      }else if (e.keyCode==83) {
+        action = 'sleep';
       }else{
         return;
       }
-      load_page(read);
+      load_page(action);
     }
 
     function load_from_twitter(id, element, error)

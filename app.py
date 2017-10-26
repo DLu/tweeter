@@ -16,12 +16,14 @@ class Reader:
         self.clear_message = None
         self.count = 0
 
-    def post(self, read):
+    def post(self, action):
         if self.current is None:
             return
         self.count += 1
-        if read:
+        if action == 'read':
             self.twit.mark_as_read(self.current)
+        elif action == 'sleep':
+            self.twit.sleep_tweet(self.current)
         else:
             self.twit.skip_tweet(self.current)
         self.current = None
@@ -62,8 +64,9 @@ def index():
 
 @app.route('/interact')
 def interact():
-    if 'read' in request.args:
-        reader.post(request.args.get('read') == 'true')
+    if 'action' in request.args:
+        action = request.args.get('action')
+        reader.post(action)
     slug = request.args.get('list', 'all')
     username = request.args.get('user', None)
     if slug == 'all':

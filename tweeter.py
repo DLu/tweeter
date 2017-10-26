@@ -80,6 +80,7 @@ class Tweeter:
         self.lists = {}
         self.ordered_lists = self.meta.get('lists', [])
         self.tweets = {}
+        self.sleeping = set()
         for slug in self.ordered_lists:
             fn = self.get_list_info(slug)
             if os.path.exists(fn):
@@ -219,6 +220,7 @@ class Tweeter:
                 fil += 1
 
         print '%d extensions, %d recursions, %d filtered' % (ext, rec, fil)
+        self.write()
         return ext, rec
 
     def update_list(self, slug, count=150):
@@ -266,6 +268,7 @@ class Tweeter:
         return False
 
     def get_tweets(self):
+        self.sleeping = set()
         for slug in self.lists:
             self.update_list(slug)
         t = threading.Thread(target=self.fix_up_tweets)
@@ -283,7 +286,7 @@ class Tweeter:
     def is_valid_tweet(self, tweet, mode):
         if mode == 'all':
             return True
-        if tweet['id_str'] in self.skipped:
+        if tweet['id_str'] in self.skipped or tweet['id_str'] in self.sleeping:
             return False
         if mode == 'fresh' and is_retweet(tweet):
             return False
@@ -326,6 +329,9 @@ class Tweeter:
 
     def skip_tweet(self, tweet):
         self.skipped.add(tweet['id_str'])
+
+    def sleep_tweet(self, tweet):
+        self.sleeping.add(tweet['id_str'])
 
     def mark_all(self, user, mode='fresh'):
         slug = self.get_user_list(user)
