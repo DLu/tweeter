@@ -62,6 +62,7 @@ class Tweeter:
         self.root = config['folder']
         self.mute_filters = config.get('mute', [])
         self.retweet_filters = config.get('block_retweets', [])
+        self.retweet_filters = map(str.lower, self.retweet_filters)
         if not os.path.exists(self.root):
             os.mkdir(self.root)
 
@@ -263,7 +264,7 @@ class Tweeter:
                 return True
             if 'rt_text' in tweet and needle in tweet['rt_text']:
                 return True
-        if 'rt' in tweet and tweet['handle'] in self.retweet_filters:
+        if 'rt' in tweet and tweet['handle'].lower() in self.retweet_filters:
             return True
         return False
 
