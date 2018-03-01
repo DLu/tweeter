@@ -109,7 +109,7 @@ def format_tweet():
     J = dict(reader.current)
     J.update(reader.twit.get_user(J['handle']))
     return jsonify({'html': render_template('single_tweet.html', data=J)})
-    
+
 @app.route('/format')
 def format_tweetx():
     J = dict(reader.current)
@@ -122,6 +122,15 @@ def format_tweetx():
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico')
 
+
+@app.route('/tweets.js')
+def tweet_js():
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'tweets.js')
+
+
+@app.route('/m_tweeter.css')
+def mtweet_css():
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'm_tweeter.css')
 
 @app.route('/update')
 def update():
@@ -152,4 +161,5 @@ def mark():
     return jsonify({})
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', threaded=True)
+    import sys
+    app.run(host='0.0.0.0', threaded=True, debug='-d' in sys.argv)

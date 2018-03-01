@@ -2,19 +2,11 @@
 <head>
   <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
   <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+  <script type="text/javascript" src="tweets.js"></script>
   <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="tweeter.css">
   <link rel="stylesheet" type="text/css" href="https://ghinda.net/css-toggle-switch/dist/toggle-switch.css">
   <script type=text/javascript>
-    function clear_node(node_name)
-    {
-      var node = document.getElementById(node_name);
-      while (node.hasChildNodes()) {
-        node.removeChild(node.lastChild);
-      }
-      return node;
-    }
-
     function load_page(action=null)
     {
       var params = {list: current_value('lists_select')};
@@ -56,45 +48,6 @@
       load_page(action);
     }
 
-    function load_from_twitter(id, element, error)
-    {
-      var o = $.getJSON("https://api.twitter.com/1/statuses/oembed.json?id=" + id + "&align=left&callback=?",
-        function(data){ $(element).html(data.html);});
-      if(error)
-        o.error(error);
-    }
-
-    function load_tweet(id, retweeter, id2)
-    {
-      if(id){
-        load_from_twitter(id, '#tweet',
-        function(a,b,c){
-          $.getJSON("/formatted", function(data){ $('#tweet').html(data.html) });
-        });
-      }else{
-        clear_node('tweet');
-      }
-      if(retweeter){
-        $('#rt').html('@' + retweeter + ' retweeted');
-      }else{
-        clear_node('rt');
-      }
-      if(id2){
-        load_from_twitter(id2, '#tweet2');
-      }else{
-        clear_node('tweet2');
-      }
-    }
-
-    function load_img(extra_img)
-    {
-        var img = document.getElementById('tweet_img');
-        if(extra_img){
-            img.setAttribute('src', extra_img);
-        }else{
-            img.setAttribute('src', '');
-        }
-    }
 
     function change_list()
     {
@@ -173,28 +126,7 @@
       node.appendChild(ul);
     }
 
-    function update(){
-      $.getJSON("/update",
-        function(data){
-          $('#status').html(data.message);
-          load_page();
-          });
-    }
 
-    function save_to_disk(){
-      $.getJSON("/write",
-        function(data){
-          $('#status').html(data.message);
-          });
-    }
-
-    function clear_progress(){
-      $.getJSON("/clear",
-        function(data){
-          $('#status').html(data.message);
-          load_page();
-          });
-    }
 
     function query_mark(name){
       if (confirm('Are you sure you mark ' + name + ' as read?')) {

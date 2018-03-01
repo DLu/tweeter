@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+  <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+  <script type="text/javascript" src="tweets.js"></script>
+  <script type="text/javascript" src="http://hammerjs.github.io/dist/hammer.min.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="m_tweeter.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>
+    function current_value(name){
+      var node = document.getElementById(name);
+      if(!node) return node;
+      var selector = node.options[node.selectedIndex];
+      if(selector){
+        return selector.value;
+      }
+      return 'all';
+    }
+
+    function load_page(action=null)
+    {
+      var params = {list: current_value('lists')};
+      if(action!==null)
+        params['action'] = action;
+      var user = current_value('users');
+      if(user)
+        params['user'] = user;
+
+      params['mode'] = current_value('mode_switch');
+      params['sort'] = 'list';
+
+      console.log(params);
+
+      $.getJSON('/interact', params, function(data) {
+        load_tweet(data.id, data.retweeter, data.id2);
+        load_img(data.extra_img);
+        load_lists(data.lists, 'lists');
+        load_lists(data.users, 'users');
+        //if(data.message){
+        //  $('#status').html(data.message);
+      //}
+      });
+    }
+
+    function load_lists(L, element_name)
+    {
+      var selected = current_value(element_name);
+      var node = clear_node(element_name);
+      if(!L || L.length==0)
+        return;
+      if(!selected)
+        selected = 'real';
+      var total = 0;
+      for(var i in L)
+      {
+        var name = L[i][0];
+        var size = L[i][1];
+        total += size;
+
+        node.appendChild(create_option(name, size, selected, element_name, element_name=='users'));
+      }
+      node.insertBefore(create_option('all', total, selected, element_name, element_name=='users'), node.childNodes[0]);
+    }
+
+    function create_option(name, size, selected, parent_name, is_users)
+    {
+      var line = document.createElement('option');
+      line.setAttribute('value', name);
+      if(selected==name){
+        line.setAttribute('selected', 'true');
+      }
+      line.appendChild(document.createTextNode(name + " (" + size + ") "));
+      return line;
+    }
+
+    $(function() {
+      var myElement = document.getElementById('whole_page');
+      var mc = new Hammer(myElement);
+      mc.on("swipe", function(ev) {
+        if (ev.direction == Hammer.DIRECTION_LEFT)
+        {
+          load_page('sleep')
+        }
+        else if(ev.direction == Hammer.DIRECTION_RIGHT)
+        {
+          load_page('later')
+        }
+      });
+
+      load_page();
+    });
+  </script>
+</head>
+<body>
+<div id="whole_page">
+    <div id='rt'></div>
+    <div id='tweet'></div>
+    <div id='tweet2'></div>
+    <img id='tweet_img'/><br/>
+    <table class="button_menu">
+      <tr>
+        <td width="50%">
+          <select class="interface" id="mode_switch" onchange="load_page()">
+              <option value="fresh" selected="true">Fresh</option>
+              <option value="full">Full</option>
+              <option value="all">All</option>
+          </select>
+          <select class="interface" id="lists" onchange="load_page()"></select>
+          <select class="interface" id="users" onchange="load_page()"></select>
+        <td width="50%">
+          <button type="button" class="interface" onclick="update()" >Update</button>
+          <button type="button" class="interface" onclick="load_page('read')" style="height: 90px" >Mark</button>
+    </table>
+</body>
+</html>

@@ -1,0 +1,26 @@
+.button_menu {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #ace3a9;
+}
+
+#whole_page {
+    border: 2px solid #550000;
+    width: 100%;
+    min-height: 600px;
+}
+
+.interface {
+  padding: 10px 22px;
+  color: white;
+  background-color: #70c66b;
+  font-family: 'Roboto Condensed', sans-serif;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 1px 1px 1px #191b1e;
+  font-size: medium;
+  border-radius: 12px;
+  width: 98%;
+}
