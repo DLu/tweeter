@@ -50,8 +50,15 @@
       var node = clear_node(element_name);
       if(!L || L.length==0)
         return;
-      if(!selected)
-        selected = 'real';
+      var found = false;
+      for(var i in L)
+      {
+        var name = L[i][0];
+        if (name == selected) found = true;
+      }
+
+      if(!selected || !found)
+        selected = 'all';
       var total = 0;
       for(var i in L)
       {
