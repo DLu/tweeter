@@ -31,8 +31,6 @@
       params['mode'] = current_value('mode_switch');
       params['sort'] = 'list';
 
-      console.log(params);
-
       $.getJSON('/interact', params, function(data) {
         load_tweet(data.id, data.retweeter, data.id2);
         load_img(data.extra_img);
