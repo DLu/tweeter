@@ -9,7 +9,7 @@ import threading
 
 RT_P = 'https://twitter.com/[^/]+/status/(\d+)'
 RETWEET_PATTERN = re.compile(RT_P)
-SUBTWEET_PATTERN = re.compile('.+'+RT_P, re.DOTALL)
+SUBTWEET_PATTERN = re.compile('.+' + RT_P, re.DOTALL)
 
 WEB_P = 'https://twitter.com/i/web/status/'
 
@@ -46,7 +46,7 @@ def needs_extension(text):
 
 
 def sort_by_date(tweets):
-    return sorted(tweets, key=lambda t: parser.parse(t['created_at']))
+    return sorted(tweets, key=lambda t: (parser.parse(t['created_at']), t['id_str']))
 
 
 class Tweeter:
