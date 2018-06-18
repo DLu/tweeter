@@ -289,7 +289,9 @@ class Tweeter:
             return True
         if tweet['id_str'] in self.skipped or tweet['id_str'] in self.sleeping:
             return False
-        if mode == 'fresh' and is_retweet(tweet):
+        if (mode == 'fresh' or mode == 'main') and is_retweet(tweet):
+            return False
+        if mode == 'fresh' and 'sleep' in tweet:
             return False
         return True
 
@@ -332,6 +334,10 @@ class Tweeter:
         self.skipped.add(tweet['id_str'])
 
     def sleep_tweet(self, tweet):
+        if 'sleep' not in tweet:
+            tweet['sleep'] = 1
+        else:
+            tweet['sleep'] += 1
         self.sleeping.add(tweet['id_str'])
 
     def mark_all(self, user, mode='fresh'):
