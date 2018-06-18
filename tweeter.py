@@ -49,6 +49,10 @@ def sort_by_date(tweets):
     return sorted(tweets, key=lambda t: (parser.parse(t['created_at']), t['id_str']))
 
 
+def sort_by_fame(tweets):
+    return sorted(tweets, key=lambda t: t['retweet_count'], reverse=True)
+
+
 class Tweeter:
     def __init__(self):
         config_fn = os.path.join(os.path.dirname(__file__), 'config.yaml')
@@ -351,20 +355,28 @@ class Tweeter:
 
     def get_tweet(self, slug=None, username=None, mode='fresh', sort='time'):
         if slug:
-            return self.get_tweet_from_list(slug, username, mode)
+            return self.get_tweet_from_list(slug, username, mode, sort)
 
         tweets = []
         for key in self.ordered_lists:
-            tweet = self.get_tweet_from_list(key, username, mode)
+            tweet = self.get_tweet_from_list(key, username, mode, sort)
             if tweet:
                 if sort == 'list':
                     return tweet
                 tweets.append(tweet)
         if len(tweets) > 0:
-            return sort_by_date(tweets)[0]
+            if sort == 'time':
+                return sort_by_date(tweets)[0]
+            else:
+                return sort_by_fame(tweets)[0]
 
-    def get_tweet_from_list(self, slug, username=None, mode='fresh'):
-        for tweet in sort_by_date(self.tweets[slug]):
+    def get_tweet_from_list(self, slug, username=None, mode='fresh', sort='time'):
+        if sort == 'fame':
+            tweets = sort_by_fame(self.tweets[slug])
+        else:
+            tweets = sort_by_date(self.tweets[slug])
+
+        for tweet in tweets:
             if not self.is_valid_tweet(tweet, mode):
                 continue
             elif username and username != tweet['handle']:

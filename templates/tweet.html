@@ -18,7 +18,7 @@
 
       params['mode'] = $('input[name=mode_input]:checked').val();
       var srt = $('input[name=sort_input]:checked').val();
-      if(srt=='list'){
+      if(srt!='time'){
         params['sort'] = srt;
       }
 
@@ -162,7 +162,7 @@
 
   $(function() {
     setup_switch('mode_switch', 'mode_input', ["fresh", 'main', "full", "all"]);
-    setup_switch('sort_switch', 'sort_input', ["list", "time"]);
+    setup_switch('sort_switch', 'sort_input', ["list", "time", "fame"]);
     load_page();
   });
   </script>
@@ -172,7 +172,7 @@
     <tr>
       <td width="20%">
           <div id="mode_switch" class="switch-toggle switch-candy"></div>
-          <div id="sort_switch" class="switch-toggle switch-2 switch-candy"></div>
+          <div id="sort_switch" class="switch-toggle switch-3 switch-candy"></div>
           <button type="button" class="interface" onclick="update()">Update</button>
           <!--button type="button" class="interface" onclick="save_to_disk()">Write</button-->
           <button type="button" class="interface" onclick="clear_progress()">Clear Progress</button>
