@@ -29,7 +29,7 @@
         params['user'] = user;
 
       params['mode'] = current_value('mode_switch');
-      params['sort'] = 'list';
+      params['sort'] = current_value('sort_switch');
 
       $.getJSON('/interact', params, function(data) {
         load_tweet(data.id, data.retweeter, data.id2);
@@ -108,17 +108,30 @@
     </div>
     <table class="button_menu">
       <tr>
-        <td width="50%">
+        <td width="25%">
           <select class="interface" id="mode_switch" onchange="load_page()">
               <option value="fresh" selected="true">Fresh</option>
+              <option value="main">Main</option>
               <option value="full">Full</option>
               <option value="all">All</option>
           </select>
-          <select class="interface" id="lists" onchange="load_page()"></select>
-          <select class="interface" id="users" onchange="load_page()"></select>
+        <td width="25%">
+          <select class="interface" id="sort_switch" onchange="load_page()">
+              <option value="list" selected="true">List</option>
+              <option value="time">Time</option>
+              <option value="fame">Fame</option>
+          </select>
         <td width="50%">
           <button type="button" class="interface" onclick="update()" >Update</button>
-          <button type="button" class="interface" onclick="load_page('read')" style="height: 90px" >Mark</button>
+
+      <tr>
+        <td colspan="2">
+            <select class="interface" id="lists" onchange="load_page()"></select>
+            <select class="interface" id="users" onchange="load_page()"></select>
+        </td>
+        <td>
+            <button type="button" class="interface" onclick="load_page('read')" style="height: 90px" >Mark</button>
+        </td>
     </table>
 </body>
 </html>
