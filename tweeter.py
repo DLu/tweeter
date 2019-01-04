@@ -53,6 +53,9 @@ def sort_by_fame(tweets):
     return sorted(tweets, key=lambda t: t['retweet_count'], reverse=True)
 
 
+def sort_by_views(tweets):
+    return sorted(tweets, key=lambda t: (t.get('sleep', 0), t['id_str']))
+
 class Tweeter:
     def __init__(self):
         config_fn = os.path.join(os.path.dirname(__file__), 'config.yaml')
@@ -176,7 +179,7 @@ class Tweeter:
 
     def clean_tweet(self, obj):
         tweet = {}
-        fields = ['created_at', 'id_str', 'retweet_count', 'text']
+        fields = ['created_at', 'favorite_count', 'id_str', 'retweet_count', 'text']
         copy_fields(obj, tweet, fields)
         tweet['handle'] = str(obj.user.screen_name)
         if obj.retweeted_status:
@@ -293,7 +296,7 @@ class Tweeter:
             return True
         if tweet['id_str'] in self.skipped or tweet['id_str'] in self.sleeping:
             return False
-        if (mode == 'fresh' or mode == 'main') and is_retweet(tweet):
+        if mode == 'main' and is_retweet(tweet):
             return False
         if mode == 'fresh' and 'sleep' in tweet:
             return False
@@ -358,31 +361,50 @@ class Tweeter:
             return self.get_tweet_from_list(slug, username, mode, sort)
 
         tweets = []
+        saved_tweets = []
         for key in self.ordered_lists:
             tweet = self.get_tweet_from_list(key, username, mode, sort)
             if tweet:
-                if sort == 'list':
+                if mode == 'fresh' and is_retweet(tweet):
+                    saved_tweets.append(tweet)
+                elif sort == 'list':
                     return tweet
-                tweets.append(tweet)
+                else:
+                    tweets.append(tweet)
+        if len(tweets) == 0:
+            if sort == 'list' and len(saved_tweets):
+                return saved_tweets[0]
+            tweets = saved_tweets
         if len(tweets) > 0:
             if sort == 'time':
                 return sort_by_date(tweets)[0]
+            elif sort == 'views':
+                return sort_by_views(tweets)[0]
             else:
                 return sort_by_fame(tweets)[0]
 
     def get_tweet_from_list(self, slug, username=None, mode='fresh', sort='time'):
         if sort == 'fame':
             tweets = sort_by_fame(self.tweets[slug])
+        elif sort == 'views':
+            tweets = sort_by_views(self.tweets[slug])
         else:
             tweets = sort_by_date(self.tweets[slug])
 
+        saved = None
         for tweet in tweets:
             if not self.is_valid_tweet(tweet, mode):
                 continue
             elif username and username != tweet['handle']:
                 continue
+            elif mode == 'fresh' and is_retweet(tweet):
+                if saved is None:
+                    saved = tweet
+                continue
             else:
                 return tweet
+        if saved:
+            return saved
 
     def clear_skips(self):
         n = len(self.skipped)

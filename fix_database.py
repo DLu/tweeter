@@ -3,5 +3,7 @@
 import tweeter
 
 twit = tweeter.Tweeter()
-twit.fix_up_tweets()
-twit.write()
+try:
+    twit.fix_up_tweets()
+finally:
+    twit.write()

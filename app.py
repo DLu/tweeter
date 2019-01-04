@@ -49,6 +49,8 @@ class Reader:
         m = INSTAGRAM_PATTERN.search(tweet['text'] + ' ' + tweet.get('rt_text', ''))
         if m:
             M['extra_img'] = 'https://instagram.com/p/%s/media/?size=m' % m.group(1)
+        if sort == 'views':
+            M['message'] = str(self.current.get('sleep', ''))
         return M
 
     def needs_writing(self):
