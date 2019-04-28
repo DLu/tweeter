@@ -9,6 +9,16 @@ app = Flask(__name__)
 Mobility(app)
 
 INSTAGRAM_PATTERN = re.compile('https://(?:www\.)?instagram.com/p/([^/]*)/')
+INSTAGRAM_PATTERN2 = re.compile('https://(?:www\.)?instagram.com/[^/]*/p/([^/]*)/')
+INSTA_PATTERNS = [INSTAGRAM_PATTERN, INSTAGRAM_PATTERN2]
+
+def get_instagram_url(tweet):
+    s = tweet['text'] + ' ' + tweet.get('rt_text', '')
+    for pattern in INSTA_PATTERNS:
+        m = pattern.search(s)
+        if m:
+            return 'https://instagram.com/p/%s/media/?size=m' % m.group(1)
+
 WRITE_COUNT = 15
 
 
@@ -46,9 +56,8 @@ class Reader:
             M['retweeter'] = tweet['handle']
         if 'id2' in tweet:
             M['id2'] = tweet['id2']
-        m = INSTAGRAM_PATTERN.search(tweet['text'] + ' ' + tweet.get('rt_text', ''))
-        if m:
-            M['extra_img'] = 'https://instagram.com/p/%s/media/?size=m' % m.group(1)
+        
+        M['extra_img'] = get_instagram_url(tweet)
         if sort == 'views':
             M['message'] = str(self.current.get('sleep', ''))
         return M

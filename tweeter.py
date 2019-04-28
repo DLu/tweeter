@@ -64,7 +64,8 @@ class Tweeter:
         self.api = twitter.Api(consumer_key=config['api_key'],
                                consumer_secret=config['api_secret'],
                                access_token_key=config['token'],
-                               access_token_secret=config['token_secret'])
+                               access_token_secret=config['token_secret'],
+                               tweet_mode='extended')
 
         self.root = config['folder']
         self.mute_filters = config.get('mute', [])
@@ -254,7 +255,6 @@ class Tweeter:
                 continue
             if tweet not in self.tweets[slug]:
                 self.tweets[slug].append(tweet)
-            print tweet['id_str'], tweet['text']
             if first_id is None:
                 first_id = tweet['id_str']
             max_id = tweet['id_str']
